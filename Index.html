@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>On Q — Portfolio Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#06070e;
+  --surface:rgba(255,255,255,0.04);
+  --surface-hover:rgba(255,255,255,0.07);
+  --glass-border:rgba(255,255,255,0.10);
+  --glass-border-bright:rgba(255,255,255,0.18);
+  --text:#f0f3ff;
+  --text2:#8892b0;
+  --text3:#4a5270;
+  --gold:#c8a96e;
+  --gold-dim:rgba(200,169,110,0.15);
+  --gold-glow:rgba(200,169,110,0.4);
+  --accent:#5b8fff;
+  --accent-dim:rgba(91,143,255,0.12);
+  --green:#2dce89;
+  --green-dim:rgba(45,206,137,0.12);
+  --amber:#ffbe3d;
+  --amber-dim:rgba(255,190,61,0.12);
+  --red:#ff5c7a;
+  --red-dim:rgba(255,92,122,0.12);
+  --r:14px;
+  --r-sm:9px;
+  --font:'Inter',system-ui,sans-serif;
+}
+@keyframes bgOrb1{0%{transform:translate(0%,0%) scale(1);}33%{transform:translate(4%,6%) scale(1.08);}66%{transform:translate(-3%,3%) scale(0.95);}100%{transform:translate(0%,0%) scale(1);}}
+@keyframes bgOrb2{0%{transform:translate(0%,0%) scale(1);}40%{transform:translate(-5%,-4%) scale(1.1);}80%{transform:translate(3%,5%) scale(0.93);}100%{transform:translate(0%,0%) scale(1);}}
+@keyframes bgOrb3{0%{transform:translate(0%,0%) scale(1);}50%{transform:translate(6%,-3%) scale(1.06);}100%{transform:translate(0%,0%) scale(1);}}
+@keyframes floatDock{0%,100%{transform:translateX(-50%) translateY(0px);}50%{transform:translateX(-50%) translateY(-5px);}}
+@keyframes dockEntrance{0%{opacity:0;transform:translateX(-50%) translateY(40px) scale(0.9);}100%{opacity:1;transform:translateX(-50%) translateY(0px) scale(1);}}
+@keyframes cardEntrance{0%{opacity:0;transform:translateY(20px) scale(0.97);}100%{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes shimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
+@keyframes pulse-ring{0%{transform:scale(1);opacity:0.6;}100%{transform:scale(1.5);opacity:0;}}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes statCount{0%{opacity:0;transform:scale(0.5) translateY(8px);}70%{transform:scale(1.08) translateY(-2px);}100%{opacity:1;transform:scale(1) translateY(0);}}
+@keyframes orb-glow{0%,100%{opacity:0.18;}50%{opacity:0.28;}}
+@keyframes pulse-border{0%,100%{box-shadow:0 0 0 0 rgba(255,60,60,0.3);}50%{box-shadow:0 0 0 4px rgba(255,60,60,0);}}
+
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.5;min-height:100vh;overflow-x:hidden;}
+.bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);}
+.orb-1{width:700px;height:500px;top:-100px;left:-100px;background:radial-gradient(ellipse,rgba(80,100,220,0.18) 0%,transparent 70%);animation:bgOrb1 18s ease-in-out infinite;}
+.orb-2{width:600px;height:600px;bottom:-150px;right:-100px;background:radial-gradient(ellipse,rgba(200,169,110,0.12) 0%,transparent 70%);animation:bgOrb2 22s ease-in-out infinite;}
+.orb-3{width:500px;height:400px;top:40%;left:40%;background:radial-gradient(ellipse,rgba(45,206,137,0.07) 0%,transparent 70%);animation:bgOrb3 15s ease-in-out infinite;}
+.orb-4{width:400px;height:300px;top:20%;right:20%;background:radial-gradient(ellipse,rgba(200,100,255,0.06) 0%,transparent 70%);animation:bgOrb1 25s ease-in-out infinite reverse;}
+.bg-photo{position:fixed;inset:0;z-index:0;pointer-events:none;background-size:cover;background-position:center top;background-repeat:no-repeat;opacity:0.09;filter:grayscale(0.3) brightness(0.8) contrast(1.1);animation:orb-glow 10s ease-in-out infinite;}
+.layout{display:flex;min-height:100vh;position:relative;z-index:1;}
+.main{flex:1;display:flex;flex-direction:column;min-height:100vh;padding-bottom:110px;}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:50;padding:1rem 1.75rem;display:flex;align-items:center;justify-content:space-between;background:rgba(6,7,14,0.75);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--glass-border);}
+.topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(91,143,255,0.35),rgba(200,169,110,0.2),transparent);}
+.page-title{font-size:18px;font-weight:700;letter-spacing:-0.025em;background:linear-gradient(135deg,#fff 0%,rgba(200,169,110,0.8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.page-sub{font-size:11px;color:var(--text3);margin-top:3px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all 0.2s;border:none;position:relative;overflow:hidden;}
+.btn::after{content:'';position:absolute;inset:0;border-radius:99px;background:linear-gradient(135deg,rgba(255,255,255,0.15) 0%,transparent 60%);pointer-events:none;}
+.btn-outline{background:rgba(255,255,255,0.06);border:1px solid var(--glass-border-bright) !important;color:var(--text2);}
+.btn-outline:hover{background:rgba(255,255,255,0.1);color:var(--text);transform:translateY(-1px);}
+.btn-primary{background:linear-gradient(135deg,#5b8fff,#7b6fff);color:#fff;box-shadow:0 4px 20px rgba(91,143,255,0.3),inset 0 1px 0 rgba(255,255,255,0.2);}
+.btn-primary:hover{box-shadow:0 8px 30px rgba(91,143,255,0.45);transform:translateY(-2px);}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#dbb96e);color:#1a1200;font-weight:700;box-shadow:0 4px 20px var(--gold-glow),inset 0 1px 0 rgba(255,255,255,0.3);}
+.btn-gold:hover{box-shadow:0 8px 30px rgba(200,169,110,0.6);transform:translateY(-2px);}
+.btn-sm{padding:6px 13px;font-size:11px;}
+.btn:disabled{opacity:0.3;cursor:not-allowed;transform:none !important;}
+.btn-danger{background:var(--red-dim);border:1px solid rgba(255,92,122,0.25) !important;color:var(--red);}
+
+/* BUBBLE DOCK */
+.bubble-dock{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:200;display:flex;align-items:center;gap:4px;padding:7px 10px;background:rgba(10,12,22,0.75);backdrop-filter:blur(32px);-webkit-backdrop-filter:blur(32px);border:1px solid var(--glass-border-bright);border-radius:99px;box-shadow:0 30px 70px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.03) inset,0 2px 0 rgba(255,255,255,0.1) inset;animation:dockEntrance 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards,floatDock 6s ease-in-out 0.7s infinite;}
+.bubble-dock::before{content:'';position:absolute;inset:0;border-radius:99px;background:linear-gradient(135deg,rgba(255,255,255,0.07) 0%,transparent 50%);pointer-events:none;}
+.dock-logo{height:24px;width:auto;margin:0 6px 0 4px;opacity:0.9;filter:drop-shadow(0 0 6px rgba(200,169,110,0.3));transition:filter 0.3s;}
+.dock-sep{width:1px;height:22px;background:linear-gradient(to bottom,transparent,var(--glass-border-bright),transparent);margin:0 4px;flex-shrink:0;}
+.dock-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:99px;border:none;background:transparent;color:var(--text2);font-size:12px;font-weight:600;font-family:var(--font);cursor:pointer;transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;}
+.dock-btn:hover{background:rgba(255,255,255,0.09);color:var(--text);transform:scale(1.06) translateY(-1px);}
+.dock-btn:active{transform:scale(0.97);}
+.dock-btn.active{background:linear-gradient(135deg,rgba(91,143,255,0.25),rgba(91,143,255,0.1));color:var(--accent);box-shadow:0 0 0 1px rgba(91,143,255,0.35),0 4px 18px rgba(91,143,255,0.2),inset 0 1px 0 rgba(255,255,255,0.1);}
+.dock-btn svg{width:14px;height:14px;flex-shrink:0;}
+.dock-badge{font-size:9px;font-weight:700;background:var(--accent);color:#fff;padding:1px 5px;border-radius:99px;min-width:16px;text-align:center;line-height:1.5;box-shadow:0 0 8px rgba(91,143,255,0.5);}
+.dock-btn-gold{background:linear-gradient(135deg,rgba(200,169,110,0.18),rgba(200,169,110,0.07));color:var(--gold);box-shadow:0 0 0 1px rgba(200,169,110,0.22);}
+.dock-btn-gold:hover{background:linear-gradient(135deg,rgba(200,169,110,0.28),rgba(200,169,110,0.14));color:#e8c480;transform:scale(1.06) translateY(-1px);}
+.dock-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#e8c480);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1a1200;flex-shrink:0;box-shadow:0 0 14px var(--gold-glow);cursor:default;transition:all 0.2s;margin:0 2px;}
+.dock-avatar:hover{transform:scale(1.1);box-shadow:0 0 22px rgba(200,169,110,0.6);}
+.dock-avatar-wrap{position:relative;}
+.dock-avatar-wrap:hover .dock-tooltip{opacity:1;transform:translateX(-50%) translateY(-6px);}
+.dock-tooltip{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(0);background:rgba(10,12,22,0.95);border:1px solid var(--glass-border-bright);padding:6px 12px;border-radius:10px;white-space:nowrap;font-size:11px;font-weight:500;color:var(--text);pointer-events:none;opacity:0;transition:all 0.2s;box-shadow:0 10px 30px rgba(0,0,0,0.5);}
+
+/* CONTENT */
+.content{padding:1.5rem 1.75rem;flex:1;}
+.view{display:none;}
+.view.active{display:block;animation:cardEntrance 0.4s cubic-bezier(0.34,1.2,0.64,1) both;}
+
+/* STAT CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:1.75rem;}
+.stat-card{background:linear-gradient(145deg,rgba(255,255,255,0.07) 0%,rgba(255,255,255,0.02) 100%);border:1px solid var(--glass-border);border-top:1px solid var(--glass-border-bright);border-radius:var(--r);padding:1.2rem 1.3rem;position:relative;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.09);animation:cardEntrance 0.5s cubic-bezier(0.34,1.2,0.64,1) both;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.3s;cursor:default;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);}
+.stat-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.04) 0%,transparent 50%);border-radius:inherit;pointer-events:none;}
+.stat-card:hover{transform:translateY(-6px) perspective(600px) rotateX(3deg) scale(1.02);box-shadow:0 24px 60px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.12);}
+.stat-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;}
+.stat-val{font-size:32px;font-weight:700;line-height:1;letter-spacing:-0.04em;animation:statCount 0.6s cubic-bezier(0.34,1.56,0.64,1) both;}
+.stat-val.c-accent{color:var(--accent);text-shadow:0 0 24px rgba(91,143,255,0.5);}
+.stat-val.c-green{color:var(--green);text-shadow:0 0 24px rgba(45,206,137,0.4);}
+.stat-val.c-amber{color:var(--amber);text-shadow:0 0 24px rgba(255,190,61,0.4);}
+.stat-val.c-red{color:var(--red);text-shadow:0 0 24px rgba(255,92,122,0.4);}
+.stat-val.c-gold{color:var(--gold);text-shadow:0 0 24px var(--gold-glow);}
+.stat-change{font-size:10px;color:var(--text3);margin-top:5px;}
+.stat-glow{position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;filter:blur(40px);pointer-events:none;animation:orb-glow 3s ease-in-out infinite;}
+.stat-shimmer{position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);background-size:200% auto;animation:shimmer 3s linear infinite;opacity:0.5;}
+
+/* PANELS */
+.panel{background:linear-gradient(145deg,rgba(255,255,255,0.055) 0%,rgba(255,255,255,0.02) 100%);border:1px solid var(--glass-border);border-top:1px solid var(--glass-border-bright);border-radius:var(--r);overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.06);position:relative;}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);pointer-events:none;}
+.panel-head{padding:0.9rem 1.1rem;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.025);}
+.panel-title{font-size:13px;font-weight:700;letter-spacing:-0.01em;}
+.panel-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+
+/* OWNER CARDS */
+.owner-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;padding:1.1rem;}
+.owner-card{background:linear-gradient(145deg,rgba(255,255,255,0.065) 0%,rgba(255,255,255,0.02) 100%);border:1px solid var(--glass-border);border-top:1px solid var(--glass-border-bright);border-radius:var(--r);padding:1.1rem;cursor:pointer;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);position:relative;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.07);}
+.owner-card::after{content:'';position:absolute;inset:0;border-radius:var(--r);background:linear-gradient(135deg,rgba(255,255,255,0.05) 0%,transparent 55%);pointer-events:none;}
+.owner-card:hover{transform:translateY(-8px) perspective(500px) rotateX(4deg) rotateY(-1deg) scale(1.03);box-shadow:0 28px 60px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.12);border-color:var(--glass-border-bright);}
+.owner-card-head{display:flex;align-items:center;gap:10px;margin-bottom:0.75rem;}
+.owner-card-name{font-size:14px;font-weight:700;letter-spacing:-0.01em;}
+.owner-card-email{font-size:11px;color:var(--text3);}
+.prop-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:0.5rem;}
+.prop-chip{font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(255,255,255,0.06);color:var(--text2);border:1px solid var(--glass-border);}
+.prop-chip.issue{background:var(--red-dim);color:var(--red);border-color:rgba(255,92,122,0.2);}
+
+/* OWNER LIST */
+.owner-list{overflow-y:auto;max-height:calc(100vh - 300px);}
+.owner-row{display:flex;align-items:center;gap:10px;padding:0.7rem 1rem;cursor:pointer;border-bottom:1px solid var(--glass-border);transition:all 0.18s;}
+.owner-row:last-child{border-bottom:none;}
+.owner-row:hover{background:rgba(255,255,255,0.04);transform:translateX(3px);}
+.owner-row.selected{background:linear-gradient(90deg,rgba(91,143,255,0.12),rgba(91,143,255,0.03));border-left:3px solid var(--accent);}
+.owner-row.selected .owner-name{color:var(--accent);}
+.o-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;transition:all 0.2s;}
+.owner-row:hover .o-avatar{transform:scale(1.1);}
+.owner-name{font-size:13px;font-weight:600;}
+.owner-meta{font-size:11px;color:var(--text3);}
+
+/* BADGES */
+.badge{font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap;letter-spacing:0.02em;transition:all 0.2s;}
+.badge-ok{background:var(--green-dim);color:var(--green);border:1px solid rgba(45,206,137,0.2);}
+.badge-warn{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(255,190,61,0.2);}
+.badge-danger{background:var(--red-dim);color:var(--red);border:1px solid rgba(255,92,122,0.2);}
+.badge-pending{background:rgba(255,255,255,0.05);color:var(--text3);border:1px solid var(--glass-border);}
+.badge-sent{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(91,143,255,0.2);}
+
+/* PROP TABLE */
+.prop-table{width:100%;border-collapse:collapse;}
+.prop-table th{text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;padding:0.65rem 1rem;border-bottom:1px solid var(--glass-border);background:rgba(255,255,255,0.02);}
+.prop-table td{padding:0.75rem 1rem;border-bottom:1px solid var(--glass-border);font-size:13px;transition:background 0.15s;}
+.prop-table tr:last-child td{border-bottom:none;}
+.prop-table tbody tr:hover td{background:rgba(255,255,255,0.03);}
+.check-circle{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--glass-border-bright);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);flex-shrink:0;}
+.check-circle:hover{border-color:var(--green);transform:scale(1.15);}
+.check-circle.done{background:linear-gradient(135deg,var(--green),#1db070);border-color:var(--green);box-shadow:0 0 14px rgba(45,206,137,0.4);transform:scale(1.05);}
+.check-circle svg{width:11px;height:11px;}
+
+/* TWO COL + COMPOSER */
+.two-col{display:grid;grid-template-columns:260px 1fr;gap:1rem;}
+.detail-wrap{display:flex;flex-direction:column;gap:1rem;}
+.composer{padding:1.1rem;}
+.field{margin-bottom:0.9rem;}
+.field-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;}
+.field-val{font-size:13px;color:var(--text2);background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:var(--r-sm);padding:7px 10px;}
+input[type="text"],input[type="number"],input[type="date"],textarea,select{width:100%;font-size:13px;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:var(--r-sm);padding:8px 11px;color:var(--text);font-family:var(--font);outline:none;transition:border-color 0.2s,box-shadow 0.2s;}
+input:focus,textarea:focus,select:focus{border-color:rgba(91,143,255,0.5);box-shadow:0 0 0 3px rgba(91,143,255,0.1);}
+textarea{resize:vertical;min-height:130px;line-height:1.7;}
+select option{background:#0f1020;color:var(--text);}
+.composer-actions{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap;}
+
+/* PROGRESS */
+.prog-wrap{padding:0 1rem 0.75rem;}
+.prog-track{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--accent),#a78fff,var(--accent));background-size:200% auto;border-radius:2px;transition:width 0.6s cubic-bezier(0.34,1.2,0.64,1);animation:shimmer 2s linear infinite;box-shadow:0 0 10px rgba(91,143,255,0.5);}
+
+/* EMPTY */
+.empty{padding:2.5rem 1rem;text-align:center;color:var(--text3);font-size:13px;}
+.empty svg{width:36px;height:36px;margin:0 auto 0.75rem;display:block;opacity:0.15;}
+
+/* TOAST */
+#toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(10,12,24,0.92);border:1px solid var(--glass-border-bright);backdrop-filter:blur(24px);color:var(--text);padding:10px 22px;border-radius:99px;font-size:13px;font-weight:600;pointer-events:none;opacity:0;transition:opacity 0.25s,transform 0.25s;z-index:9999;box-shadow:0 12px 40px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.1);white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+
+/* MODALS */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:500;display:none;align-items:center;justify-content:center;}
+.modal-backdrop.open{display:flex;}
+.modal{background:linear-gradient(145deg,rgba(18,20,36,0.98) 0%,rgba(10,12,24,0.98) 100%);border:1px solid var(--glass-border-bright);border-top:1px solid rgba(255,255,255,0.22);border-radius:var(--r);width:680px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 40px 90px rgba(0,0,0,0.75),inset 0 1px 0 rgba(255,255,255,0.08);overflow:hidden;animation:cardEntrance 0.3s cubic-bezier(0.34,1.2,0.64,1) both;}
+.modal-head{padding:1.1rem 1.25rem;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-title{font-size:15px;font-weight:700;}
+.modal-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all 0.2s;}
+.modal-close:hover{background:var(--red-dim);color:var(--red);transform:rotate(90deg);}
+.modal-body{display:flex;flex:1;overflow:hidden;min-height:0;}
+.modal-foot{padding:0.85rem 1.25rem;border-top:1px solid var(--glass-border);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0;background:rgba(255,255,255,0.02);}
+
+/* TEMPLATE MODAL */
+.tpl-sidebar{width:220px;flex-shrink:0;border-right:1px solid var(--glass-border);overflow-y:auto;display:flex;flex-direction:column;}
+.tpl-sidebar-head{padding:0.75rem 1rem;border-bottom:1px solid var(--glass-border);font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;justify-content:space-between;}
+.tpl-item{padding:0.7rem 1rem;border-bottom:1px solid var(--glass-border);cursor:pointer;transition:all 0.15s;}
+.tpl-item:hover{background:rgba(255,255,255,0.04);transform:translateX(2px);}
+.tpl-item.active{background:var(--accent-dim);border-left:2px solid var(--accent);}
+.tpl-item-name{font-size:13px;font-weight:600;margin-bottom:2px;}
+.tpl-item-desc{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tpl-main{flex:1;overflow-y:auto;padding:1.1rem;display:flex;flex-direction:column;gap:0.9rem;}
+.tpl-field-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;}
+.tpl-name-input{width:100%;font-size:13px;font-weight:600;background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);border-radius:var(--r-sm);padding:8px 10px;color:var(--text);font-family:var(--font);outline:none;}
+.tpl-textarea{width:100%;font-size:13px;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:var(--r-sm);padding:10px;color:var(--text);font-family:var(--font);outline:none;resize:vertical;min-height:200px;line-height:1.7;}
+.tpl-hint{font-size:11px;color:var(--text3);line-height:1.6;padding:8px 10px;background:rgba(91,143,255,0.06);border:1px solid rgba(91,143,255,0.12);border-radius:var(--r-sm);}
+.tpl-picker-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;background:var(--gold-dim);border:1px solid rgba(200,169,110,0.25);color:var(--gold);font-family:var(--font);transition:all 0.2s;}
+.tpl-picker-btn:hover{background:rgba(200,169,110,0.22);transform:translateY(-1px);}
+
+/* EVICTION */
+.ev-stage{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap;}
+.ev-stage-1{background:rgba(255,190,61,0.12);color:var(--amber);border:1px solid rgba(255,190,61,0.25);}
+.ev-stage-2{background:rgba(255,92,122,0.12);color:var(--red);border:1px solid rgba(255,92,122,0.25);}
+.ev-stage-3{background:rgba(200,169,110,0.12);color:var(--gold);border:1px solid rgba(200,169,110,0.25);}
+.ev-stage-4{background:rgba(255,60,60,0.18);color:#ff3c3c;border:1px solid rgba(255,60,60,0.35);animation:pulse-border 2s ease-in-out infinite;}
+.ev-stage-5{background:rgba(45,206,137,0.12);color:var(--green);border:1px solid rgba(45,206,137,0.25);}
+.ev-row-danger td{background:rgba(255,92,122,0.025);}
+.ev-row-danger:hover td{background:rgba(255,92,122,0.05) !important;}
+.ev-action-btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;border:1px solid var(--glass-border-bright);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all 0.18s;}
+.ev-action-btn:hover{background:rgba(255,255,255,0.07);color:var(--text);transform:scale(1.05);}
+.ev-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);z-index:600;display:none;align-items:center;justify-content:center;}
+.ev-modal-backdrop.open{display:flex;}
+.ev-modal{background:linear-gradient(145deg,rgba(18,20,36,0.98),rgba(10,12,24,0.98));border:1px solid var(--glass-border-bright);border-top:1px solid rgba(255,255,255,0.22);border-radius:var(--r);width:540px;max-width:95vw;box-shadow:0 40px 90px rgba(0,0,0,0.75);overflow:hidden;animation:cardEntrance 0.3s cubic-bezier(0.34,1.2,0.64,1) both;}
+.ev-modal-head{padding:1.1rem 1.25rem;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;justify-content:space-between;}
+.ev-modal-body{padding:1.25rem;display:flex;flex-direction:column;gap:0.85rem;}
+.ev-modal-foot{padding:0.85rem 1.25rem;border-top:1px solid var(--glass-border);display:flex;gap:8px;justify-content:flex-end;background:rgba(255,255,255,0.02);}
+.ev-form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;}
+.ev-form-group{display:flex;flex-direction:column;gap:5px;}
+.ev-form-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;}
+.ev-form-input,.ev-form-select{width:100%;font-size:13px;background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);border-radius:var(--r-sm);padding:8px 11px;color:var(--text);font-family:var(--font);outline:none;transition:border-color 0.2s;}
+.ev-form-input:focus,.ev-form-select:focus{border-color:rgba(91,143,255,0.5);}
+.ev-form-select option{background:#0f1020;}
+.ev-timeline{display:flex;align-items:center;gap:0;margin:0.5rem 0;}
+.ev-tl-step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;text-align:center;cursor:pointer;transition:color 0.2s;}
+.ev-tl-step.done{color:var(--green);}
+.ev-tl-step.active{color:var(--red);}
+.ev-tl-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--glass-border-bright);background:var(--bg);transition:all 0.3s;position:relative;z-index:1;}
+.ev-tl-step.done .ev-tl-dot{background:var(--green);border-color:var(--green);box-shadow:0 0 8px rgba(45,206,137,0.5);}
+.ev-tl-step.active .ev-tl-dot{background:var(--red);border-color:var(--red);box-shadow:0 0 10px rgba(255,92,122,0.6);animation:pulse-ring 1.5s ease-out infinite;}
+.ev-tl-line{flex:1;height:2px;background:var(--glass-border);margin-top:-16px;position:relative;z-index:0;}
+.ev-tl-line.done{background:linear-gradient(90deg,var(--green),var(--green));}
+
+/* EMAIL LOG */
+.email-log-row{padding:1rem 1.1rem;border-bottom:1px solid var(--glass-border);transition:background 0.15s;}
+.email-log-row:hover{background:rgba(255,255,255,0.02);}
+.email-log-row:last-child{border-bottom:none;}
+.email-body-preview{font-size:12px;color:var(--text3);white-space:pre-wrap;background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:var(--r-sm);border:1px solid var(--glass-border);margin-top:6px;line-height:1.6;}
+
+/* QUICK ADD */
+.quick-add-bar{border-bottom:1px solid var(--glass-border);background:rgba(91,143,255,0.05);padding:1rem 1.1rem;animation:cardEntrance 0.3s cubic-bezier(0.34,1.2,0.64,1) both;}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
+</div>
+<div class="bg-photo" style="background-image:url('data:image/jpeg;base64,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');"></div>
+
+<div class="layout">
+<nav class="bubble-dock" id="bubble-dock">
+  <img class="dock-logo" src="data:image/png;base64,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" alt="On Q"/>
+  <div class="dock-sep"></div>
+  <button class="dock-btn active" id="dock-overview" onclick="showView('overview')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    Overview
+  </button>
+  <button class="dock-btn" id="dock-audit" onclick="showView('audit')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    Audit
+    <span class="dock-badge" id="nav-pending-count">217</span>
+  </button>
+  <button class="dock-btn" id="dock-email" onclick="showView('email')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    Follow-ups
+    <span class="dock-badge" id="nav-sent-count" style="background:var(--green);">0</span>
+  </button>
+  <div class="dock-sep"></div>
+  <button class="dock-btn dock-btn-gold" onclick="openTplModal(null)">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    Templates
+  </button>
+  <button class="dock-btn" id="dock-laterent" onclick="showView('laterent')" style="color:var(--red);">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Late Rent
+    <span class="dock-badge" id="nav-laterent-count" style="background:var(--red);">0</span>
+  </button>
+  <button class="dock-btn" id="dock-eviction" onclick="showView('eviction')" style="color:var(--red);">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Evictions
+    <span class="dock-badge" id="nav-eviction-count" style="background:var(--red);">0</span>
+  </button>
+  <button class="dock-btn" onclick="refreshData()" id="sync-btn">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" id="sync-icon"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+    Sync
+  </button>
+  <div class="dock-sep"></div>
+  <div class="dock-avatar-wrap">
+    <div class="dock-avatar">KG</div>
+    <div class="dock-tooltip">Kenyon Gura · Portfolio Manager</div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title" id="page-title">Portfolio Overview</div>
+      <div class="page-sub" id="page-sub">All owners and properties at a glance</div>
+    </div>
+    <button class="btn btn-gold btn-sm" onclick="showView('audit')">Start Audit →</button>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="view active" id="view-overview">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-glow" style="background:var(--accent);"></div><div class="stat-shimmer"></div><div class="stat-label">Total Owners</div><div class="stat-val c-accent" id="ov-owners">217</div><div class="stat-change">Active in portfolio</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:#fff;"></div><div class="stat-shimmer"></div><div class="stat-label">Properties</div><div class="stat-val" id="ov-props">262</div><div class="stat-change">Across all owners</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:var(--red);"></div><div class="stat-shimmer"></div><div class="stat-label">Issues Flagged</div><div class="stat-val c-red" id="ov-issues">0</div><div class="stat-change">Rent or maintenance</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:var(--gold);"></div><div class="stat-shimmer"></div><div class="stat-label">Emails Sent</div><div class="stat-val c-gold" id="ov-sent">0</div><div class="stat-change">This audit cycle</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">All Owners</div><div class="panel-sub">Click any owner to begin their audit</div></div>
+          <button class="btn btn-primary btn-sm" onclick="showView('audit')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Start Auditing</button>
+        </div>
+        <div class="owner-grid" id="overview-grid"></div>
+      </div>
+    </div>
+
+    <!-- AUDIT -->
+    <div class="view" id="view-audit">
+      <div class="two-col">
+        <div class="panel" style="height:fit-content;max-height:calc(100vh - 160px);overflow:hidden;display:flex;flex-direction:column;">
+          <div class="panel-head"><div><div class="panel-title">Owners</div><div class="panel-sub" id="audit-progress-label">0 / 217 audited</div></div></div>
+          <div class="prog-wrap" style="padding-top:0.75rem;"><div class="prog-track"><div class="prog-bar" id="prog-bar" style="width:0%"></div></div></div>
+          <div class="owner-list" id="audit-owner-list"></div>
+        </div>
+        <div class="detail-wrap">
+          <div class="panel" id="prop-panel">
+            <div class="panel-head">
+              <div><div class="panel-title" id="detail-owner-name">Select an owner</div><div class="panel-sub" id="detail-owner-email">—</div></div>
+              <div style="display:flex;gap:6px;" id="detail-actions"></div>
+            </div>
+            <div id="prop-body"><div class="empty"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Pick an owner to review their properties</div></div>
+          </div>
+          <div class="panel" id="email-compose-panel" style="display:none;">
+            <div class="panel-head"><div class="panel-title">Follow-up Email</div><span class="badge badge-pending" id="compose-status">Draft</span></div>
+            <div class="composer" id="composer-body"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMAIL LOG -->
+    <div class="view" id="view-email">
+      <div class="panel">
+        <div class="panel-head"><div><div class="panel-title">Follow-up Log</div><div class="panel-sub">All emails composed this audit cycle</div></div></div>
+        <div id="email-log-body"><div class="empty"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>No emails sent yet</div></div>
+      </div>
+    </div>
+
+    <!-- LATE RENT -->
+    <div class="view" id="view-laterent">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-glow" style="background:var(--red);"></div><div class="stat-shimmer"></div><div class="stat-label">Active Cases</div><div class="stat-val c-red" id="ev-stat-active">0</div><div class="stat-change">In eviction process</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:var(--amber);"></div><div class="stat-shimmer"></div><div class="stat-label">Total Owed</div><div class="stat-val c-amber" id="ev-stat-owed">$0</div><div class="stat-change">Across all cases</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:var(--accent);"></div><div class="stat-shimmer"></div><div class="stat-label">Days Past Due</div><div class="stat-val c-accent" id="ev-stat-days">0</div><div class="stat-change">Average across cases</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:var(--green);"></div><div class="stat-shimmer"></div><div class="stat-label">Resolved</div><div class="stat-val c-green" id="ev-stat-resolved">0</div><div class="stat-change">Cases closed this cycle</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><div class="panel-title">Late Rent Tracker</div><div class="panel-sub">Track delinquent rent progressing toward eviction</div></div><button class="btn btn-primary btn-sm" onclick="openAddEviction()"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add case</button></div>
+        <div style="overflow-x:auto;"><table class="prop-table"><thead><tr><th>Tenant / Property</th><th>Owner</th><th>Amt Owed</th><th>Days Late</th><th>Stage</th><th>Last Action</th><th style="text-align:right;">Actions</th></tr></thead><tbody id="ev-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- EVICTIONS -->
+    <div class="view" id="view-eviction">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-glow" style="background:var(--red);"></div><div class="stat-shimmer"></div><div class="stat-label">Active Cases</div><div class="stat-val c-red" id="ev2-stat-active">0</div><div class="stat-change">In legal process</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:var(--amber);"></div><div class="stat-shimmer"></div><div class="stat-label">Total Claimed</div><div class="stat-val c-amber" id="ev2-stat-owed">$0</div><div class="stat-change">Across all cases</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:var(--accent);"></div><div class="stat-shimmer"></div><div class="stat-label">Pending Court</div><div class="stat-val c-accent" id="ev2-stat-court">0</div><div class="stat-change">Awaiting hearing</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:var(--green);"></div><div class="stat-shimmer"></div><div class="stat-label">Won / Resolved</div><div class="stat-val c-green" id="ev2-stat-won">0</div><div class="stat-change">Favorable outcomes</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><div class="panel-title">Eviction Cases</div><div class="panel-sub">Legal filings, court dates, and outcomes</div></div>
+          <button class="btn btn-primary btn-sm" onclick="toggleQuickAdd()"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add tenant</button>
+        </div>
+        <div id="quick-add-bar" style="display:none;" class="quick-add-bar">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.75rem;">Add tenant to eviction list</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end;">
+            <div><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Tenant name</div><input class="ev-form-input" id="qa-tenant" type="text" placeholder="Full name" style="width:100%;"/></div>
+            <div><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Property</div><input class="ev-form-input" id="qa-property" type="text" placeholder="Address" style="width:100%;"/></div>
+            <div><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Eviction date</div><input class="ev-form-input" id="qa-date" type="date" style="width:100%;"/></div>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-primary btn-sm" onclick="quickAddEviction()"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>
+              <button class="btn btn-outline btn-sm" onclick="toggleQuickAdd()">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <div style="overflow-x:auto;"><table class="prop-table"><thead><tr><th>Tenant / Property</th><th>Owner</th><th>Claimed ($)</th><th>Filing Date</th><th>Court Date</th><th>Status</th><th>Attorney / Notes</th><th style="text-align:right;">Actions</th></tr></thead><tbody id="ev2-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- TEMPLATE MODAL -->
+<div class="modal-backdrop" id="tpl-modal">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Email Templates</div><button class="modal-close" onclick="closeTplModal()">&#x2715;</button></div>
+    <div class="modal-body">
+      <div class="tpl-sidebar"><div class="tpl-sidebar-head">Templates<button class="btn btn-primary btn-sm" onclick="newTemplate()" style="padding:3px 9px;font-size:10px;">+ New</button></div><div id="tpl-list"></div></div>
+      <div class="tpl-main" id="tpl-editor"><div style="text-align:center;color:var(--text3);padding:2rem;font-size:13px;">Select a template or create a new one.</div></div>
+    </div>
+    <div class="modal-foot" id="tpl-modal-foot" style="display:none;">
+      <button class="btn btn-danger btn-sm" onclick="deleteTemplate()">Delete</button>
+      <button class="btn btn-outline btn-sm" onclick="closeTplModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveTemplate()">Save template</button>
+    </div>
+  </div>
+</div>
+
+<!-- LATE RENT MODAL -->
+<div class="ev-modal-backdrop" id="ev-modal-backdrop">
+  <div class="ev-modal">
+    <div class="ev-modal-head"><div class="modal-title" id="ev-modal-title">New Late Rent Case</div><button class="modal-close" onclick="closeEvModal()">&#x2715;</button></div>
+    <div class="ev-modal-body">
+      <div class="ev-form-row"><div class="ev-form-group"><label class="ev-form-label">Tenant name</label><input class="ev-form-input" id="ev-tenant" type="text" placeholder="Full name"/></div><div class="ev-form-group"><label class="ev-form-label">Property address</label><input class="ev-form-input" id="ev-property" type="text" placeholder="Street address"/></div></div>
+      <div class="ev-form-row"><div class="ev-form-group"><label class="ev-form-label">Owner</label><input class="ev-form-input" id="ev-owner" type="text" placeholder="Owner name"/></div><div class="ev-form-group"><label class="ev-form-label">Stage</label><select class="ev-form-select" id="ev-stage-sel"><option value="1">1 — Notice Sent</option><option value="2">2 — 30-Day Notice</option><option value="3">3 — Filing Filed</option><option value="4">4 — Court Date</option><option value="5">5 — Resolved</option></select></div></div>
+      <div class="ev-form-row"><div class="ev-form-group"><label class="ev-form-label">Amount owed ($)</label><input class="ev-form-input" id="ev-amt" type="number" placeholder="0.00"/></div><div class="ev-form-group"><label class="ev-form-label">Days past due</label><input class="ev-form-input" id="ev-days" type="number" placeholder="0"/></div></div>
+      <div class="ev-form-group"><label class="ev-form-label">Last action taken</label><input class="ev-form-input" id="ev-last-action" type="text" placeholder="e.g. 3-Day notice posted"/></div>
+      <div class="ev-form-group"><label class="ev-form-label">Notes</label><input class="ev-form-input" id="ev-notes" type="text" placeholder="Case notes, partial payments, contacts..."/></div>
+    </div>
+    <div class="ev-modal-foot"><button class="btn btn-outline btn-sm" onclick="closeEvModal()">Cancel</button><button class="btn btn-primary btn-sm" onclick="saveEvCase()">Save case</button></div>
+  </div>
+</div>
+
+<!-- EVICTION MODAL -->
+<div class="ev-modal-backdrop" id="ev2-modal-backdrop">
+  <div class="ev-modal">
+    <div class="ev-modal-head"><div class="modal-title" id="ev2-modal-title">New Eviction Case</div><button class="modal-close" onclick="closeEv2Modal()">&#x2715;</button></div>
+    <div class="ev-modal-body">
+      <div class="ev-form-row"><div class="ev-form-group"><label class="ev-form-label">Tenant name</label><input class="ev-form-input" id="ev2-tenant" type="text" placeholder="Full name"/></div><div class="ev-form-group"><label class="ev-form-label">Property address</label><input class="ev-form-input" id="ev2-property" type="text" placeholder="Street address"/></div></div>
+      <div class="ev-form-row"><div class="ev-form-group"><label class="ev-form-label">Owner</label><input class="ev-form-input" id="ev2-owner" type="text" placeholder="Owner name"/></div><div class="ev-form-group"><label class="ev-form-label">Amount claimed ($)</label><input class="ev-form-input" id="ev2-amt" type="number" placeholder="0.00"/></div></div>
+      <div class="ev-form-row"><div class="ev-form-group"><label class="ev-form-label">Filing date</label><input class="ev-form-input" id="ev2-filing" type="date"/></div><div class="ev-form-group"><label class="ev-form-label">Court date</label><input class="ev-form-input" id="ev2-court" type="date"/></div></div>
+      <div class="ev-form-row"><div class="ev-form-group"><label class="ev-form-label">Status</label><select class="ev-form-select" id="ev2-status"><option value="Filed">Filed</option><option value="Served">Served</option><option value="Court Pending">Court Pending</option><option value="Judgment">Judgment Issued</option><option value="Won">Won</option><option value="Settled">Settled</option><option value="Dismissed">Dismissed</option></select></div><div class="ev-form-group"><label class="ev-form-label">Attorney / Firm</label><input class="ev-form-input" id="ev2-attorney" type="text" placeholder="Attorney name or firm"/></div></div>
+      <div class="ev-form-group"><label class="ev-form-label">Case number / Notes</label><input class="ev-form-input" id="ev2-notes" type="text" placeholder="Case #, court notes, outcome details..."/></div>
+    </div>
+    <div class="ev-modal-foot"><button class="btn btn-outline btn-sm" onclick="closeEv2Modal()">Cancel</button><button class="btn btn-primary btn-sm" onclick="saveEv2Case()">Save case</button></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const OWNERS=[
+  {id:1,name:'10810 MARSHALL AVE LLC 2.0',initials:'12',email:'naveen@aznaveen.com',phone:'(480) 652-4455',color:'#5b8fff',props:[{"addr": "10810 West Marshall Avenue, Phoenix, AZ 85037", "rent": true, "maint": true}]},
+  {id:2,name:'2261 Harper LLC',initials:'2L',email:'mattrluebke@gmail.com',phone:'(480) 278-5247',color:'#2dce89',props:[{"addr": "2261 South Harper, Mesa, AZ 85209", "rent": true, "maint": true}]},
+  {id:3,name:'2438 WARBLER RD LLC',initials:'2L',email:'naveen@aznaveen.com',phone:'(480) 652-4455',color:'#ffbe3d',props:[{"addr": "2438 East Warbler Road, Gilbert, AZ 85297", "rent": true, "maint": true}]},
+  {id:4,name:'4644 W Nutmeg Mgmt LLC',initials:'4L',email:'tyler1ballard@gmail.com',phone:'(801) 497-6798',color:'#c97aff',props:[{"addr": "4644 West Nutmeg Avenue, Coolidge, AZ 85128", "rent": true, "maint": true}]},
+  {id:5,name:'ABIGAIL KASSA',initials:'AK',email:'abi.kassa@gmail.com',phone:'(240) 796-7910',color:'#ff7a7a',props:[{"addr": "1922 West Jefferson Street, Phoenix, AZ 85009", "rent": true, "maint": true}]},
+  {id:6,name:'ABISAG PEREZ',initials:'AP',email:'abby.perez@dominiuminc.com',phone:'(602) 710-7427',color:'#c8a96e',props:[{"addr": "1617 West Colter Street, Unit 15, Phoenix, AZ 85015", "rent": true, "maint": true}]},
+  {id:7,name:'ANELIME HOLDING LLC',initials:'AL',email:'takyar1337@gmail.com',phone:'(760) 835-8375',color:'#22d4c8',props:[{"addr": "23757 North Desert Agave Street, Florence, AZ 85132", "rent": true, "maint": true}, {"addr": "660 South Pinal Parkway Avenue, Unit 107, Florence, AZ 85132", "rent": true, "maint": true}, {"addr": "199 North Phoenix Street, Florence, AZ 85132", "rent": true, "maint": true}]},
+  {id:8,name:'Aaron Inouye',initials:'AI',email:'aci200sr@gmail.com',phone:'(408) 402-1308',color:'#ff9f43',props:[{"addr": "147 East Constitution Court, Gilbert, AZ 85296", "rent": true, "maint": true}]},
+  {id:9,name:'Abraham Owusu -Dommey',initials:'A-',email:'mkodommey@aol.com',phone:'(480) 208-3846',color:'#a29bfe',props:[{"addr": "3028 South 78th Drive, Phoenix, AZ 85043", "rent": true, "maint": true}]},
+  {id:10,name:'Abramson Family Trust',initials:'AT',email:'kaharried@msn.com',phone:'(916) 801-8697',color:'#fd79a8',props:[{"addr": "4247 East Comstock Drive, Gilbert, AZ 85234", "rent": true, "maint": true}]},
+  {id:11,name:'Alec McDonald',initials:'AM',email:'alecjmcdonald@gmail.com',phone:'(650) 218-2955',color:'#5b8fff',props:[{"addr": "19079 North 90th Place, Scottsdale, AZ 85255", "rent": true, "maint": true}]},
+  {id:12,name:'Alexander Townsend',initials:'AT',email:'arstownsend@gmail.com',phone:'(414) 614-6849',color:'#2dce89',props:[{"addr": "3645 North 69th Avenue, Unit 6, Phoenix, AZ 85033", "rent": true, "maint": true}]},
+  {id:13,name:'Alexandra Olson',initials:'AO',email:'alexandraolson13@gmail.com',phone:'(520) 861-0995',color:'#ffbe3d',props:[{"addr": "2402 East 5th Street, Unit 1436, Tempe, AZ 85288", "rent": true, "maint": true}]},
+  {id:14,name:'Allan Cadreau',initials:'AC',email:'allan.h.cadreau@gmail.com',phone:'(248) 703-6130',color:'#c97aff',props:[{"addr": "6231 North 30th Way, Phoenix, AZ 85016", "rent": true, "maint": true}]},
+  {id:15,name:'Allen Heiden',initials:'AH',email:'roxanne_heiden@yahoo.com',phone:'480-812-8127',color:'#ff7a7a',props:[{"addr": "4713 East Bighorn Avenue, Phoenix, AZ 85044", "rent": true, "maint": true}]},
+  {id:16,name:'Amber Cheng and Charles Lee',initials:'AL',email:'acheng2020@aol.com',phone:'(857) 756-0397',color:'#c8a96e',props:[{"addr": "272 East Markwood Drive, Chandler, AZ 85286", "rent": true, "maint": true}]},
+  {id:17,name:'Andrew Appel',initials:'AA',email:'drew.h.appel@gmail.com',phone:'(562) 595-3691',color:'#22d4c8',props:[{"addr": "1808 South Follett Way, Gilbert, AZ 85295", "rent": true, "maint": true}, {"addr": "1817 South Follett Way, Gilbert, AZ 85295", "rent": true, "maint": true}]},
+  {id:18,name:'Andrew and Marcella Rubalcava',initials:'AR',email:'ilvny0911@hotmail.com',phone:'(480) 238-7247',color:'#ff9f43',props:[{"addr": "10234 East Javelina Avenue, Mesa, AZ 85209", "rent": true, "maint": true}]},
+  {id:19,name:'Anelime Prof. Medical Services',initials:'AS',email:'takyar1337@gmail.com',phone:'(760) 835-8375',color:'#a29bfe',props:[{"addr": "24554 North Shelton Way, Florence, AZ 85132", "rent": true, "maint": true}, {"addr": "23635 North Oasis Boulevard, Florence, AZ 85132", "rent": true, "maint": true}, {"addr": "180 North Pinal Parkway Avenue, Florence, AZ 85132", "rent": true, "maint": true}, {"addr": "225 North Phoenix Street, Unit A, Florence, AZ 85132", "rent": true, "maint": true}, {"addr": "225 North Phoenix Street, Unit B, Florence, AZ 85132", "rent": true, "maint": true}]},
+  {id:20,name:'Ann Barker',initials:'AB',email:'annb5435@gmail.com',phone:'(602) 421-2185',color:'#fd79a8',props:[{"addr": "1351 West 14th Street, Tempe, AZ 85281", "rent": true, "maint": true}]},
+  {id:21,name:'Anna Koehler',initials:'AK',email:'anna.koehler20@gmail.com',phone:'(952) 210-5665',color:'#5b8fff',props:[{"addr": "7702 North Dreamy Draw Drive, Phoenix, AZ 85020", "rent": true, "maint": true}]},
+  {id:22,name:'Antonio Bottiglierie',initials:'AB',email:'aebott10@gmail.com',phone:'(480) 522-4827',color:'#2dce89',props:[{"addr": "1407 South 7th Street, Coolidge, AZ 85128", "rent": true, "maint": true}]},
+  {id:23,name:'Arturo Ruiz and Ethan Williams',initials:'AW',email:'artrui31@gmail.com',phone:'(575) 997-8372',color:'#ffbe3d',props:[{"addr": "886 West Summit Place, Chandler, AZ 85225", "rent": true, "maint": true}]},
+  {id:24,name:'Austin P & Rachel L Phillippe',initials:'AP',email:'bordenrachel641@gmail.com',phone:'(480) 353-9092',color:'#c97aff',props:[{"addr": "614 West Wagner Court, Gilbert, AZ 85233", "rent": true, "maint": true}]},
+  {id:25,name:'BARRETT FAMILY TRUST',initials:'BT',email:'elevateyourbusiness22@gmail.com',phone:'(602) 814-2604',color:'#ff7a7a',props:[{"addr": "7205 West Krall Street, Glendale, AZ 85303", "rent": true, "maint": true}]},
+  {id:26,name:'BRADLEY K & RAQUEL H CARR',initials:'BC',email:'b.kaden.carr@gmail.com',phone:'(702) 978-2244',color:'#c8a96e',props:[{"addr": "2831 South Aletta, Mesa, AZ 85212", "rent": true, "maint": true}]},
+  {id:27,name:'Benjamin and Sharley Leavitt',initials:'BL',email:'ben.s.leavitt@gmail.com',phone:'(858) 386-8092',color:'#22d4c8',props:[{"addr": "3132 East Edgewood Avenue, Mesa, AZ 85204", "rent": true, "maint": true}]},
+  {id:28,name:'Benny Phan',initials:'BP',email:'capitalflooring83@yahoo.com',phone:'(480) 381-5555',color:'#ff9f43',props:[{"addr": "2442 West Seaver Avenue, Apache Junction, AZ 85210", "rent": true, "maint": true}]},
+  {id:29,name:'Bharani Nallabelle',initials:'BN',email:'bharaninbk@gmail.com',phone:'(310) 291-8408',color:'#a29bfe',props:[{"addr": "10137 West Los Gatos Drive, Peoria, AZ 85383", "rent": true, "maint": true}]},
+  {id:30,name:'Bhavani Ramagiri and Manasa Kuruvada',initials:'BK',email:'rbprasad83@gmail.com',phone:'(480) 297-8555',color:'#fd79a8',props:[{"addr": "859 East Knightsbridge Way, Gilbert, AZ 85297", "rent": true, "maint": true}]},
+  {id:31,name:'Bouakeo Thongkham',initials:'BT',email:'keothongkham2000@yahoo.com',phone:'(310) 904-8436',color:'#5b8fff',props:[{"addr": "12123 West Bell Road, Unit 248, Surprise, AZ 85378", "rent": true, "maint": true}]},
+  {id:32,name:'Breanna Eden',initials:'BE',email:'breana.eden@yahoo.com',phone:'(602) 721-5353',color:'#2dce89',props:[{"addr": "6314 South Colonial Way, Tempe, AZ 85283", "rent": true, "maint": true}]},
+  {id:33,name:'Breen Family Living Trust',initials:'BT',email:'breener23@gmail.com',phone:'(650) 799-0291',color:'#ffbe3d',props:[{"addr": "9919 East Wavelength Avenue, Mesa, AZ 85212", "rent": true, "maint": true}]},
+  {id:34,name:'Brooke Ethington',initials:'BE',email:'brooke.ethington1@gmail.com',phone:'480-528-2891',color:'#c97aff',props:[{"addr": "2071 East Saratoga Street, Gilbert, AZ 85296", "rent": true, "maint": true}]},
+  {id:35,name:'CARLOS F P PEREZ GUADALUPE A SANDOVAL',initials:'CS',email:'aburtoguadalupe046@live.com',phone:'(623) 277-6581',color:'#ff7a7a',props:[{"addr": "148 West Dewey Avenue, Coolidge, AZ 85128", "rent": true, "maint": true}]},
+  {id:36,name:'CAROLYN POMONIS',initials:'CP',email:'carolyn.pomonis@gmail.com',phone:'(480) 363-7763',color:'#c8a96e',props:[{"addr": "4643 South Pearl Drive, Chandler, AZ 85249", "rent": true, "maint": true}]},
+  {id:37,name:'CHANDRAKANTH GADWALA RICHA RANGWAR',initials:'CR',email:'chandrakanth.gadwala@gmail.com',phone:'(510) 984-8280',color:'#22d4c8',props:[{"addr": "7415 South 33rd Lane, Phoenix, AZ 85041", "rent": true, "maint": true}]},
+  {id:38,name:'CHRISTOPHER W and JESSICA V ROZENWASER ROZENWASER LIVING TRUST',initials:'CT',email:'',phone:'',color:'#ff9f43',props:[{"addr": "4641 West Geronimo Street, Chandler, AZ 85226", "rent": true, "maint": true}]},
+  {id:39,name:'Camille Cerami',initials:'CC',email:'ccerami.realtor@gmail.com',phone:'(602) 741-6232',color:'#a29bfe',props:[{"addr": "3308 East Patrick Street, Gilbert, AZ 85295", "rent": true, "maint": true}]},
+  {id:40,name:'Carlos Leotaud',initials:'CL',email:'carlosmanuelleotaud@gmail.com',phone:'(602) 875-7109',color:'#fd79a8',props:[{"addr": "533 West Guadalupe Road, Unit 2089, Mesa, AZ 85210", "rent": true, "maint": true}]},
+  {id:41,name:'Charles Alvarez',initials:'CA',email:'cralvarez5@hotmail.com',phone:'951-733-6465',color:'#5b8fff',props:[{"addr": "6790 East Shamrock Street, Florence, AZ 85132", "rent": true, "maint": true}]},
+  {id:42,name:'Charles Alvarez (LS)',initials:'C(',email:'cralvarez5@hotmail.com',phone:'(951) 733-6465',color:'#2dce89',props:[{"addr": "1759 West Roosevelt Avenue, Coolidge, AZ 85128", "rent": true, "maint": true}]},
+  {id:43,name:'Charles Stubbs',initials:'CS',email:'charlesss88@icloud.com',phone:'(480) 228-5002',color:'#ffbe3d',props:[{"addr": "21161 East Stonecrest Drive, Queen Creek, AZ 85142", "rent": true, "maint": true}]},
+  {id:44,name:'Chede Nageswar',initials:'CN',email:'nagchede@yahoo.com',phone:'(201) 245-8522',color:'#c97aff',props:[{"addr": "3111 Medallion Court, Casa Grande, AZ 85122", "rent": true, "maint": true}]},
+  {id:45,name:'Chetan Khatri',initials:'CK',email:'cnk122@gmail.com',phone:'(928) 446-6605',color:'#ff7a7a',props:[{"addr": "10241 West Camelia Drive, Arizona City, AZ 85123", "rent": true, "maint": true}]},
+  {id:46,name:'Chongji Liu',initials:'CL',email:'liuchongji@gmail.com',phone:'(480) 307-7779',color:'#c8a96e',props:[{"addr": "3615 West Camino Del Rio, Glendale, AZ 85310", "rent": true, "maint": true}]},
+  {id:47,name:'Chung Lin',initials:'CL',email:'chunglin2007@gmail.com',phone:'(541) 745-9045',color:'#22d4c8',props:[{"addr": "16851 West Cavedale Drive, Surprise, AZ 85387", "rent": true, "maint": true}, {"addr": "609 East Mesquite Circle, Unit C119, Tempe, AZ 85288", "rent": true, "maint": true}, {"addr": "16778 West Molly Lane, Surprise, AZ 85387", "rent": true, "maint": true}]},
+  {id:48,name:'Cody Mitchell',initials:'CM',email:'codytru7@gmail.com',phone:'(480) 589-6383',color:'#ff9f43',props:[{"addr": "6910 South 13th Way, Phoenix, AZ 85042", "rent": true, "maint": true}, {"addr": "2342 East Hidalgo Avenue, Phoenix, AZ 85040", "rent": true, "maint": true}]},
+  {id:49,name:'DAVID & LEAH AABERG',initials:'DA',email:'broxsonleah@gmail.com',phone:'(850) 313-0753',color:'#a29bfe',props:[{"addr": "18784 West Madison Street, Buckeye, AZ 85326", "rent": true, "maint": true}]},
+  {id:50,name:'DAVID GROUCHEY',initials:'DG',email:'pol4327@calgarypolice.ca',phone:'(403) 880-8120',color:'#fd79a8',props:[{"addr": "15844 West Papago Street, Goodyear, AZ 85338", "rent": true, "maint": true}]},
+  {id:51,name:'DAVINDER & KAUR MANPREET SINGH',initials:'DS',email:'engdavinder@gmail.com',phone:'(602) 545-5459',color:'#5b8fff',props:[{"addr": "1532 West Park Avenue, Gilbert, AZ 85233", "rent": true, "maint": true}]},
+  {id:52,name:'DENICE DUNKERLEY',initials:'DD',email:'stuartdunkerley@yahoo.com',phone:'(480) 703-4784',color:'#2dce89',props:[{"addr": "1109 East Leaf Road, San Tan Valley, AZ 85140", "rent": true, "maint": true}]},
+  {id:53,name:'DESERT SAND WELLNESS LLC',initials:'DL',email:'uduak.ukpong@gmail.com',phone:'(602) 550-7757',color:'#ffbe3d',props:[{"addr": "615 East Cody Drive, Phoenix, AZ 85040", "rent": true, "maint": true}]},
+  {id:54,name:'Daniel Schulz',initials:'DS',email:'schulz081@gmail.com',phone:'(818) 261-0472',color:'#c97aff',props:[{"addr": "474 West San Remo Street, Gilbert, AZ 85233", "rent": true, "maint": true}]},
+  {id:55,name:'Debola Jallen',initials:'DJ',email:'thejallens44@gmail.com',phone:'(623) 888-1824',color:'#ff7a7a',props:[{"addr": "3463 South Seneca Way, Gilbert, AZ 85297", "rent": true, "maint": true}]},
+  {id:56,name:'Desert Sand 6Th Drive LLC',initials:'DL',email:'uduak.ukpong@gmail.com',phone:'(602) 550-7757',color:'#c8a96e',props:[{"addr": "20236 North 6th Drive, Unit 8, Phoenix, AZ 85027", "rent": true, "maint": true}]},
+  {id:57,name:'Devi Patra',initials:'DP',email:'devosy4ever@gmail.com',phone:'(318) 364-9157',color:'#22d4c8',props:[{"addr": "4521 East Saint John Road, Phoenix, AZ 85032", "rent": true, "maint": true}]},
+  {id:58,name:'Dina Daville',initials:'DD',email:'dina99@me.com',phone:'(619) 992-2974',color:'#ff9f43',props:[{"addr": "1225 North 36th Street, Unit 1095, Phoenix, AZ 85008", "rent": true, "maint": true}]},
+  {id:59,name:'Ding, Tie gang',initials:'DG',email:'wangxiaomei688@gmail.com',phone:'(781) 775-0866',color:'#a29bfe',props:[{"addr": "3519 East Loma Vista Street, Gilbert, AZ 85295", "rent": true, "maint": true}, {"addr": "893 South Utilis Drive, Gilbert, AZ 85296", "rent": true, "maint": true}]},
+  {id:60,name:'Duc Cong Bui & Ngoc Suong Thi Nguyen Living Trust',initials:'DT',email:'ducbui@att.net',phone:'(951) 314-9560',color:'#fd79a8',props:[{"addr": "6731 West McRae Way, Glendale, AZ 85308", "rent": true, "maint": true}]},
+  {id:61,name:'Duong, Huy',initials:'DH',email:'huyduong1971@gmail.com',phone:'408 466-2804',color:'#5b8fff',props:[{"addr": "2560 South Dragoon Drive, Chandler, AZ 85286", "rent": true, "maint": true}]},
+  {id:62,name:'Edwin Varela',initials:'EV',email:'edwin.varela0615@gmail.com',phone:'(602) 412-7914',color:'#2dce89',props:[{"addr": "3003 East Kings Avenue, Phoenix, AZ 85032", "rent": true, "maint": true}, {"addr": "5027 South 11th Street, Phoenix, AZ 85040", "rent": true, "maint": true}]},
+  {id:63,name:'FABIAN H F AHUMADA SILVANA P ACUNA',initials:'FA',email:'farelofabian@gmail.com',phone:'(813) 770-3034',color:'#ffbe3d',props:[{"addr": "7928 East Pepper Tree Lane, Scottsdale, AZ 85250", "rent": true, "maint": true}]},
+  {id:64,name:'FIGUEROA JESUS/ANA L',initials:'FL',email:'2124jfigueroa@gmail.com',phone:'(707) 318-6594',color:'#c97aff',props:[{"addr": "10608 East Lincoln Avenue, Mesa, AZ 85212", "rent": true, "maint": true}]},
+  {id:65,name:'FLOYD N & AURA COBURN JR',initials:'FJ',email:'floydcoburn@gmail.com',phone:'(623) 297-1146',color:'#ff7a7a',props:[{"addr": "10210 North 7th Avenue, Unit 3, Phoenix, AZ 85021", "rent": true, "maint": true}, {"addr": "9608 North 1st Avenue, Phoenix, AZ 85021", "rent": true, "maint": true}]},
+  {id:66,name:'Fatima Covarrubias',initials:'FC',email:'fcovaesp56@gmail.com',phone:'(760) 715-7577',color:'#c8a96e',props:[{"addr": "8830 West Coronado Drive, Arizona City, AZ 85123", "rent": true, "maint": true}]},
+  {id:67,name:'First Move LLC',initials:'FL',email:'brandonbyrne83@gmail.com',phone:'(602) 750-0274',color:'#22d4c8',props:[{"addr": "10264 Bickwell Trail, Apache Junction, AZ 85120", "rent": true, "maint": true}]},
+  {id:68,name:'Free Agent Property Solutions LLC',initials:'FL',email:'ldemar1300@gmail.com',phone:'(773) 507-1376',color:'#ff9f43',props:[{"addr": "9011 South 8th Place, Unit 1, Phoenix, AZ 85042", "rent": true, "maint": true}, {"addr": "9011 South 8th Place, Unit 2, Phoenix, AZ 85042", "rent": true, "maint": true}, {"addr": "9011 South 8th Place, Unit 3, Phoenix, AZ 85042", "rent": true, "maint": true}]},
+  {id:69,name:'GANAPATHI ADHINARAYANAN ANURADHA PANCHAPAKESAN',initials:'GP',email:'agansu@gmail.com',phone:'(602) 321-4666',color:'#a29bfe',props:[{"addr": "26018 North 52nd Lane, Phoenix, AZ 85083", "rent": true, "maint": true}]},
+  {id:70,name:'GORDON K WILSON',initials:'GW',email:'notall.whowander@yahoo.com',phone:'(480) 748-5132',color:'#fd79a8',props:[{"addr": "1319 East Pierce Street, Phoenix, AZ 85006", "rent": true, "maint": true}]},
+  {id:71,name:'Gary and Gretchen Ukele',initials:'GU',email:'gaukeles@gmail.com',phone:'(307) 267-8653',color:'#5b8fff',props:[{"addr": "726 South Nebraska Street, Building 1, Unit 173, Chandler, AZ 85225", "rent": true, "maint": true}]},
+  {id:72,name:'George and Camille Wheeler',initials:'GW',email:'camille.a.wheeler@gmail.com',phone:'(619) 651-5666',color:'#2dce89',props:[{"addr": "3566 East Woodside Way, Gilbert, AZ 85297", "rent": true, "maint": true}, {"addr": "956 South Banning Street, Gilbert, AZ 85296", "rent": true, "maint": true}, {"addr": "319 North Tiago Drive, Gilbert, AZ 85233", "rent": true, "maint": true}, {"addr": "2966 East Dublin Street, Gilbert, AZ 85295", "rent": true, "maint": true}]},
+  {id:73,name:'Gerald Haug',initials:'GH',email:'jerryhaug@yahoo.com',phone:'(408) 891-2705',color:'#ffbe3d',props:[{"addr": "8888 North 47th Avenue, Unit 216, Glendale, AZ 85302", "rent": true, "maint": true}]},
+  {id:74,name:'HBL Holdings LLC',initials:'HL',email:'chacejackson@icloud.com',phone:'(480) 519-4089',color:'#c97aff',props:[{"addr": "14247 West Bronco Trail, Surprise, AZ 85387", "rent": true, "maint": true}]},
+  {id:75,name:'HEATHER and BRENDAN DONNELLAN',initials:'HD',email:'bgd1014@gmail.com',phone:'(480) 206-9376',color:'#ff7a7a',props:[{"addr": "1826 East Kent Avenue, Chandler, AZ 85225", "rent": true, "maint": true}]},
+  {id:76,name:'Harinder K Takyar',initials:'HT',email:'takyar1337@gmail.com',phone:'(760) 835-8375',color:'#c8a96e',props:[{"addr": "5216 North Sabino Hills Drive, Tucson, AZ 85749", "rent": true, "maint": true}]},
+  {id:77,name:'Harinder and Raman Takyar',initials:'HT',email:'takyar1337@gmail.com',phone:'(760) 835-8375',color:'#22d4c8',props:[{"addr": "10094 East Stone Spring Place, Tucson, AZ 85749", "rent": true, "maint": true}]},
+  {id:78,name:'Harsey Family Trust',initials:'HT',email:'stevenharsey446@gmail.com',phone:'(714) 253-2863',color:'#ff9f43',props:[{"addr": "2870 East Alexander Court, Gilbert, AZ 85298", "rent": true, "maint": true}, {"addr": "2860 East Wyatt Way, Gilbert, AZ 85297", "rent": true, "maint": true}]},
+  {id:79,name:'Heath Leigh',initials:'HL',email:'halbus10@gmail.com',phone:'(480) 305-4837',color:'#a29bfe',props:[{"addr": "3131 West Baylor Lane, Chandler, AZ 85226", "rent": true, "maint": true}]},
+  {id:80,name:'Heesoung Lim',initials:'HL',email:'lhslhs88@gmail.com',phone:'(520) 369-9010',color:'#fd79a8',props:[{"addr": "828 East Ashurst Drive, Phoenix, AZ 85048", "rent": true, "maint": true}]},
+  {id:81,name:'Hesam Doraji and Marjan Ebadeh',initials:'HE',email:'hdoraji@hotmail.com',phone:'(818) 302-9178',color:'#5b8fff',props:[{"addr": "770 West Cherrywood Drive, Chandler, AZ 85248", "rent": true, "maint": true}]},
+  {id:82,name:'Horne Familia, LLC',initials:'HL',email:'charlesadamhorne@gmail.com',phone:'(480) 323-6874',color:'#2dce89',props:[{"addr": "652 East Aurora Drive, San Tan Valley, AZ 85140", "rent": true, "maint": true}]},
+  {id:83,name:'IMAYAVARAMBAN AMBIKAPATHY and MAHALAKSHMI IMAYAVARAMBAN',initials:'II',email:'imay19@gmail.com',phone:'(732) 939-9219',color:'#ffbe3d',props:[{"addr": "16414 North 2nd Drive, Phoenix, AZ 85023", "rent": true, "maint": true}]},
+  {id:84,name:'JAMES SHENG XIANGZHEN HE',initials:'JH',email:'janet2015he@gmail.com',phone:'(480) 729-5099',color:'#c97aff',props:[{"addr": "9272 East Hillery Way, Scottsdale, AZ 85260", "rent": true, "maint": true}]},
+  {id:85,name:'JAYANTH K & SHWETHA NATARAJA SHWETHA NADIGER',initials:'JN',email:'jayanthkn@gmail.com',phone:'(408) 674-8293',color:'#ff7a7a',props:[{"addr": "10151 West Los Gatos Drive, Peoria, AZ 85383", "rent": true, "maint": true}]},
+  {id:86,name:'JESSICA MURRELL',initials:'JM',email:'jdmurrellbrooks58@gmail.com',phone:'(928) 242-1216',color:'#c8a96e',props:[{"addr": "2127 West San Miguel Avenue, Phoenix, AZ 85015", "rent": true, "maint": true}]},
+  {id:87,name:'JESSIE DE LA PENA VERONICA BANUELOS',initials:'JB',email:'jessied818@msn.com',phone:'(608) 304-0398',color:'#22d4c8',props:[{"addr": "21304 Shelby Court, Maricopa, AZ 85138", "rent": true, "maint": true}, {"addr": "3751 East Sierrita Road, Queen Creek, AZ 85143", "rent": true, "maint": true}]},
+  {id:88,name:'JITIN and SHILPA BATRA',initials:'JB',email:'jitinbatra@yahoo.com',phone:'(480) 280-2171',color:'#ff9f43',props:[{"addr": "6842 West Molly Lane, Peoria, AZ 85383", "rent": true, "maint": true}]},
+  {id:89,name:'JOHN PARKER',initials:'JP',email:'johnpinaz91@gmail.com',phone:'(602) 391-5568',color:'#a29bfe',props:[{"addr": "26311 South 204th Street, Queen Creek, AZ 85142", "rent": true, "maint": true}]},
+  {id:90,name:'JONATHAN N AYON and CHRISTINA TARANGO',initials:'JT',email:'ja.cheeto@gmail.com',phone:'(619) 370-7735',color:'#fd79a8',props:[{"addr": "2384 East San Miguel Drive, Casa Grande, AZ 85194", "rent": true, "maint": true}]},
+  {id:91,name:'JOSE A & LETICIA J BOLANOS',initials:'JB',email:'jose-bolanos@sbcglobal.net',phone:'(510) 209-7952',color:'#5b8fff',props:[{"addr": "13518 West Berridge Lane, Litchfield Park, AZ 85340", "rent": true, "maint": true}]},
+  {id:92,name:'Jacob Mullenix',initials:'JM',email:'jmullenix01@yahoo.com',phone:'(623) 216-1315',color:'#2dce89',props:[{"addr": "2850 East Yuma Avenue, Apache Junction, AZ 85119", "rent": true, "maint": true}]},
+  {id:93,name:'James D Stewart',initials:'JS',email:'stewy12006@yahoo.com',phone:'(480) 621-0065',color:'#ffbe3d',props:[{"addr": "215 East McKinley Street, Unit 404, Phoenix, AZ 85004", "rent": true, "maint": true}]},
+  {id:94,name:'Jayden Cordier',initials:'JC',email:'jaydencordier@gmail.com',phone:'(360) 790-2135',color:'#c97aff',props:[{"addr": "3690 East Longhorn Street, San Tan Valley, AZ 85140", "rent": true, "maint": true}]},
+  {id:95,name:'Jerome  Caywood',initials:'JC',email:'corporatevisionary@gmail.com',phone:'(602) 718-5058',color:'#ff7a7a',props:[{"addr": "1350 South Greenfield Road, Unit 2133, Mesa, AZ 85206", "rent": true, "maint": true}, {"addr": "1241 North Pebble Beach Drive, Gilbert, AZ 85234", "rent": true, "maint": true}]},
+  {id:96,name:'Jessica Oostdam',initials:'JO',email:'jessicaoostdam@yahoo.com',phone:'9513064722',color:'#c8a96e',props:[{"addr": "1806 South Wooten Street, Coolidge, AZ 85128", "rent": true, "maint": true}]},
+  {id:97,name:'Jinyu Qian and Zijie Zhang',initials:'JZ',email:'qianjinyu@gmail.com',phone:'(786) 212-4388',color:'#22d4c8',props:[{"addr": "921 West University Drive, Unit 1220, Mesa, AZ 85201", "rent": true, "maint": true}]},
+  {id:98,name:'JoAnne Loughlin',initials:'JL',email:'loughlin1@sbcglobal.net',phone:'(707) 479-1042',color:'#ff9f43',props:[{"addr": "2039 West Olive Way, Chandler, AZ 85248", "rent": true, "maint": true}]},
+  {id:99,name:'Joel Michael Duncan',initials:'JD',email:'joelduncan@rocketmail.com',phone:'(760) 499-4833',color:'#a29bfe',props:[{"addr": "3923 South Amber Rock Avenue, Tucson, AZ 85735", "rent": true, "maint": true}]},
+  {id:100,name:'John Heck',initials:'JH',email:'jwheck246@gmail.com',phone:'(480) 586-6435',color:'#fd79a8',props:[{"addr": "1717 North Oleander Street, Tempe, AZ 85281", "rent": true, "maint": true}]},
+  {id:101,name:'Joli and Richard DeFazio',initials:'JD',email:'hernandez.joli@yahoo.com',phone:'(916) 704-1037',color:'#5b8fff',props:[{"addr": "1725 East Monte Vista Road, Phoenix, AZ 85006", "rent": true, "maint": true}]},
+  {id:102,name:'Jonathan Hasemeier',initials:'JH',email:'jonathan.hasemeier@gmail.com',phone:'(480) 241-1101',color:'#2dce89',props:[{"addr": "827 West Ivanhoe Street, Chandler, AZ 85225", "rent": true, "maint": true}]},
+  {id:103,name:'Joseph Stratton',initials:'JS',email:'j123ss@gmail.com',phone:'(480) 404-4199',color:'#ffbe3d',props:[{"addr": "3504 East Melody Lane, Gilbert, AZ 85234", "rent": true, "maint": true}]},
+  {id:104,name:'Josephine Okonkwo',initials:'JO',email:'josephineokonkwo@gmail.com',phone:'(480) 259-0673',color:'#c97aff',props:[{"addr": "41326 West Hopper Drive, Maricopa, AZ 85138", "rent": true, "maint": true}]},
+  {id:105,name:'KALPESHKUMAR PATEL',initials:'KP',email:'kalpat0308@gmail.com',phone:'(480) 262-6910',color:'#ff7a7a',props:[{"addr": "3537 East Michelle Way, Gilbert, AZ 85234", "rent": true, "maint": true}]},
+  {id:106,name:'KAREN L PAOLI',initials:'KP',email:'karen@metroprinting.us',phone:'(602) 980-0828',color:'#c8a96e',props:[{"addr": "4052 East Palo Brea Lane, Cave Creek, AZ 85331", "rent": true, "maint": true}]},
+  {id:107,name:'KARLA Y C VILLALOBOS',initials:'KV',email:'edward.brewer1121@gmail.com',phone:'602-551-9050',color:'#22d4c8',props:[{"addr": "3830 West Cavalier Drive, Phoenix, AZ 85019", "rent": true, "maint": true}]},
+  {id:108,name:'KRANTHIKUMAR YEZENDLA',initials:'KY',email:'kyezendla@gmail.com',phone:'(732) 599-6429',color:'#ff9f43',props:[{"addr": "10520 West Quail Avenue, Peoria, AZ 85382", "rent": true, "maint": true}]},
+  {id:109,name:'KYLE A PIERCY',initials:'KP',email:'piercyky@gmail.com',phone:'+1 (248) 935-3781',color:'#a29bfe',props:[{"addr": "2308 East Yale Street, Phoenix, AZ 85008", "rent": true, "maint": true}]},
+  {id:110,name:'Kalyani Pula',initials:'KP',email:'rao3139@gmail.com',phone:'(520) 869-0797',color:'#fd79a8',props:[{"addr": "2630 North 109th Avenue, Avondale, AZ 85392", "rent": true, "maint": true}]},
+  {id:111,name:'Kamal and Tahmina Ahmed',initials:'KA',email:'shifat.ahmed39@gmail.com',phone:'(480) 284-0549',color:'#5b8fff',props:[{"addr": "4051 East Mesquite Street, Gilbert, AZ 85296", "rent": true, "maint": true}, {"addr": "3074 South Southwind Drive, Gilbert, AZ 85295", "rent": true, "maint": true}]},
+  {id:112,name:'Kelly Family Trust',initials:'KT',email:'kelly156@earthlink.net',phone:'(650) 669-2218',color:'#2dce89',props:[{"addr": "3001 East Grazing Herd Lane, San Tan Valley, AZ 85140", "rent": true, "maint": true}, {"addr": "10205 East Ursula Avenue, Mesa, AZ 85212", "rent": true, "maint": true}, {"addr": "10206 East Ursula Avenue, Mesa, AZ 85212", "rent": true, "maint": true}, {"addr": "2917 East Grazing Herd Lane, San Tan Valley, AZ 85140", "rent": true, "maint": true}, {"addr": "2865 East Frontiersman Lane, San Tan Valley, AZ 85140", "rent": true, "maint": true}, {"addr": "23067 East Lords Way, Queen Creek, AZ 85142", "rent": true, "maint": true}, {"addr": "8325 East Paloma Avenue, Mesa, AZ 85212", "rent": true, "maint": true}]},
+  {id:113,name:'Kevin Boone',initials:'KB',email:'susycolt50@gmail.com',phone:'(650) 291-6448',color:'#ffbe3d',props:[{"addr": "3784 North 297th Lane, Buckeye, AZ 85396", "rent": true, "maint": true}]},
+  {id:114,name:'Kramer J Henson',initials:'KH',email:'golffiend4life@hotmail.com',phone:'(253) 651-4708',color:'#c97aff',props:[{"addr": "4641 East Culver Street, Phoenix, AZ 85008", "rent": true, "maint": true}]},
+  {id:115,name:'Kristie Lane-Ford',initials:'KL',email:'mail@kristielane.com',phone:'(602) 292-9004',color:'#ff7a7a',props:[{"addr": "8009 West Quail Avenue, Peoria, AZ 85382", "rent": true, "maint": true}]},
+  {id:116,name:'L & A 633 INVESTMENTS LLC',initials:'LL',email:'',phone:'',color:'#c8a96e',props:[{"addr": "633 North May, Unit 31, Mesa, AZ 85201", "rent": true, "maint": true}]},
+  {id:117,name:'LIPING KONG',initials:'LK',email:'lpkong2@yahoo.com',phone:'(480) 295-1670',color:'#22d4c8',props:[{"addr": "4167 East Glacier Place, Chandler, AZ 85249", "rent": true, "maint": true}, {"addr": "20561 East Sonoqui Boulevard, Queen Creek, AZ 85142", "rent": true, "maint": true}]},
+  {id:118,name:'LISA OSZUST and ERIC OSZUST',initials:'LO',email:'lmoszust2@gmail.com',phone:'(480) 843-4267',color:'#ff9f43',props:[{"addr": "1649 East Balboa Drive, Casa Grande, AZ 85122", "rent": true, "maint": true}]},
+  {id:119,name:'LUIS F CARRASCO',initials:'LC',email:'lfcarr24@gmail.com',phone:'(480) 452-5996',color:'#a29bfe',props:[{"addr": "18929 West Wilson Street, Buckeye, AZ 85326", "rent": true, "maint": true}]},
+  {id:120,name:'LiHong He',initials:'LH',email:'liliart_ho@hotmail.com',phone:'(480) 274-7487',color:'#fd79a8',props:[{"addr": "1089 North Willow Street, Chandler, AZ 85226", "rent": true, "maint": true}]},
+  {id:121,name:'Lidster Group, LLC',initials:'LL',email:'gmantonu@gmail.com',phone:'(734) 620-4589',color:'#5b8fff',props:[{"addr": "255 North Tiago Drive, Gilbert, AZ 85233", "rent": true, "maint": true}]},
+  {id:122,name:'MATTHEW R SCHMELZLE',initials:'MS',email:'matthew.schmelzle@gmail.com',phone:'+1 (480) 688-6542',color:'#2dce89',props:[{"addr": "1642 East Bruce Avenue, Gilbert, AZ 85234", "rent": true, "maint": true}]},
+  {id:123,name:'MAYBOCA OBED PENA',initials:'MP',email:'obeonepilot@gmail.com',phone:'(602) 910-8467',color:'#ffbe3d',props:[{"addr": "2153 South Catarina, Mesa, AZ 85202", "rent": true, "maint": true}]},
+  {id:124,name:'MELANIE CLARK',initials:'MC',email:'melanie.k.clark@gmail.com',phone:'(480) 516-4229',color:'#c97aff',props:[{"addr": "1102 North Martingale Road, Gilbert, AZ 85234", "rent": true, "maint": true}]},
+  {id:125,name:'MENAKA GUPTA and KUNAL CHEDA',initials:'MC',email:'kunalatusa@yahoo.com',phone:'(425) 686-5244',color:'#ff7a7a',props:[{"addr": "4411 South Pecan Drive, Chandler, AZ 85248", "rent": true, "maint": true}]},
+  {id:126,name:'MICHAELLE L WILLIAMS',initials:'MW',email:'aneidabreak@gmail.com',phone:'(520) 450-8794',color:'#c8a96e',props:[{"addr": "586 West Silver Reef Court, Casa Grande, AZ 85122", "rent": true, "maint": true}]},
+  {id:127,name:'MUMM FAMILY LIVING TRUST',initials:'MT',email:'rodmumm@sbcglobal.net',phone:'(480) 381-3344',color:'#22d4c8',props:[{"addr": "2565 South Signal Butte Road, Unit 48, Mesa, AZ 85209", "rent": true, "maint": true}]},
+  {id:128,name:'Mae and Orlando Hizon',initials:'MH',email:'yaneyme18@yahoo.com',phone:'(818) 621-0618',color:'#ff9f43',props:[{"addr": "4405 Stickleaf Way, San Tan Valley, AZ 85142", "rent": true, "maint": true}]},
+  {id:129,name:'Man Li and Yong Peng',initials:'MP',email:'manli68@hotmail.com',phone:'(507) 398-6727',color:'#a29bfe',props:[{"addr": "20570 East Via De Colina, Queen Creek, AZ 85142", "rent": true, "maint": true}]},
+  {id:130,name:'Mandy Hackl',initials:'MH',email:'hackl7881@gmail.com',phone:'414.430.1093',color:'#fd79a8',props:[{"addr": "4766 East Appaloosa Drive, Eloy, AZ 85131", "rent": true, "maint": true}, {"addr": "4744 East Appaloosa Drive, Eloy, AZ 85131", "rent": true, "maint": true}]},
+  {id:131,name:'Michael Fahey',initials:'MF',email:'michael.t.fahey@gmail.com',phone:'(203) 539-9538',color:'#5b8fff',props:[{"addr": "4911 East Village Drive, Scottsdale, AZ 85254", "rent": true, "maint": true}]},
+  {id:132,name:'Michael L Garrison',initials:'MG',email:'buckx6504@yahoo.com',phone:'(520) 510-9736',color:'#2dce89',props:[{"addr": "4516 West Cinnamon Avenue, Coolidge, AZ 85128", "rent": true, "maint": true}]},
+  {id:133,name:'Michelle Le',initials:'ML',email:'michelle@highnooncode.com',phone:'(623) 692-5443',color:'#ffbe3d',props:[{"addr": "8622 West Roanoke Avenue, Phoenix, AZ 85037", "rent": true, "maint": true}]},
+  {id:134,name:'Michelle Luttrell',initials:'ML',email:'maluttrell79@gmail.com',phone:'(480) 330-5629',color:'#c97aff',props:[{"addr": "7460 West Lone Cactus Drive, Glendale, AZ 85308", "rent": true, "maint": true}]},
+  {id:135,name:'NICHOLAS J MILLER',initials:'NM',email:'nicholasj.miller@live.com',phone:'(575) 343-5074',color:'#ff7a7a',props:[{"addr": "1343 North Balboa, Mesa, AZ 85205", "rent": true, "maint": true}]},
+  {id:136,name:'NORMA APODACA LIVING TRUST',initials:'NT',email:'pepy11@hotmail.com',phone:'(858) 602-6444',color:'#c8a96e',props:[{"addr": "2707 South 103rd Drive, Tolleson, AZ 85353", "rent": true, "maint": true}]},
+  {id:137,name:'Narayanprasad D & Lalithn Samant',initials:'NS',email:'ndsamant@gmail.com',phone:'(202) 286-9883',color:'#22d4c8',props:[{"addr": "7312 North 90th Lane, Glendale, AZ 85305", "rent": true, "maint": true}]},
+  {id:138,name:'Naveen Boyapati',initials:'NB',email:'naveenboyapati12@gmail.com',phone:'(480) 652-7809',color:'#ff9f43',props:[{"addr": "2927 E Riane Rd, Phoenix, AZ 85050", "rent": true, "maint": true}, {"addr": "10741 West Yearling Road, Peoria, AZ 85383", "rent": true, "maint": true}]},
+  {id:139,name:'Navjot Khalsa and Abhimanyu Kashyap',initials:'NK',email:'navjot.ranike@gmail.com',phone:'(206) 475-5778',color:'#a29bfe',props:[{"addr": "155 North Lakeview Boulevard, Unit 257, Chandler, AZ 85225", "rent": true, "maint": true}, {"addr": "4156 East Brisa Drive, Gilbert, AZ 85296", "rent": true, "maint": true}]},
+  {id:140,name:'Nguyen, Hung',initials:'NH',email:'hungyen4750@gmail.com',phone:'(480) 748-9147',color:'#fd79a8',props:[{"addr": "1190 North Spire Drive, Chandler, AZ 85224", "rent": true, "maint": true}]},
+  {id:141,name:'Nicholas Odom',initials:'NO',email:'nckodom@yahoo.com',phone:'(480) 703-2229',color:'#5b8fff',props:[{"addr": "1800 West Elliot Road, Unit 243, Chandler, AZ 85224", "rent": true, "maint": true}]},
+  {id:142,name:'Nina M Rosa Living Trust',initials:'NT',email:'ninarule62@gmail.com',phone:'(775) 622-2476',color:'#2dce89',props:[{"addr": "10430 West Caron Drive, Sun City, AZ 85351", "rent": true, "maint": true}]},
+  {id:143,name:'Omer Karakoc',initials:'OK',email:'omerkarakoc2018@gmail.com',phone:'(979) 721-0554',color:'#ffbe3d',props:[{"addr": "20813 South 191st Way, Queen Creek, AZ 85142", "rent": true, "maint": true}]},
+  {id:144,name:'PARAMPARA HOLDINGS LLC',initials:'PL',email:'singhpreeti77@hotmail.com',phone:'(480) 993-7969',color:'#c97aff',props:[{"addr": "6223 East Via Estrella Avenue, Paradise Valley, AZ 85253", "rent": true, "maint": true}]},
+  {id:145,name:'PMK PROPERTIES LLC',initials:'PL',email:'pmkelly8651@gmail.com',phone:'(319) 533-7110',color:'#ff7a7a',props:[{"addr": "7714 East Fledgling Drive, Scottsdale, AZ 85255", "rent": true, "maint": true}]},
+  {id:146,name:'PRK VPD Living Trust',initials:'PT',email:'prabhurk1983@gmail.com',phone:'(832) 296-1074',color:'#c8a96e',props:[{"addr": "9782 West Foothill Drive, Peoria, AZ 85383", "rent": true, "maint": true}]},
+  {id:147,name:'Parker Family Trust',initials:'PT',email:'cnparker12@hotmail.com',phone:'(619) 787-3535',color:'#22d4c8',props:[{"addr": "4144 East Jasper Drive, Gilbert, AZ 85296", "rent": true, "maint": true}, {"addr": "1006 East Diamond Drive, Tempe, AZ 85283", "rent": true, "maint": true}]},
+  {id:148,name:'Pei En Yu',initials:'PY',email:'tp953414@gmail.com',phone:'(480) 619-9619',color:'#ff9f43',props:[{"addr": "7041 West Coles Road, Phoenix, AZ 85339", "rent": true, "maint": true}]},
+  {id:149,name:'Penny Lane Getaways LLC',initials:'PL',email:'anna.koehler20@gmail.com',phone:'(952) 210-5665',color:'#a29bfe',props:[{"addr": "2925 East Cheery Lynn Road, Phoenix, AZ 85016", "rent": true, "maint": true}]},
+  {id:150,name:'Prasann and Shital Deshmukh',initials:'PD',email:'prasannvdeshmukh@gmail.com',phone:'(614) 971-6546',color:'#fd79a8',props:[{"addr": "24220 West Fraktur Road, Buckeye, AZ 85326", "rent": true, "maint": true}]},
+  {id:151,name:'RICHARD & JULIE KENNEDY',initials:'RK',email:'juliekennedy420@gmail.com',phone:'(815) 260-8853',color:'#5b8fff',props:[{"addr": "577 West Lucky Penny Place, Casa Grande, AZ 85122", "rent": true, "maint": true}]},
+  {id:152,name:'Raghu Arambakam',initials:'RA',email:'raghurajasimha@gmail.com',phone:'(310) 977-4689',color:'#2dce89',props:[{"addr": "1093 North Willow Street, Chandler, AZ 85226", "rent": true, "maint": true}]},
+  {id:153,name:'Rezaul Aziz',initials:'RA',email:'rezaulaziz02@gmail.com',phone:'(602) 920-4104',color:'#ffbe3d',props:[{"addr": "2017 East Carob Drive, Chandler, AZ 85286", "rent": true, "maint": true}]},
+  {id:154,name:'Richard Kowel',initials:'RK',email:'rkowel@aol.com',phone:'(516) 825-6396',color:'#c97aff',props:[{"addr": "11114 East Blue Sky Drive, Scottsdale, AZ 85262", "rent": true, "maint": true}, {"addr": "20814 North 38th Street, Phoenix, AZ 85050", "rent": true, "maint": true}]},
+  {id:155,name:'Rick Armstrong',initials:'RA',email:'rickarmstrong84@gmail.com',phone:'(310) 500-8358',color:'#ff7a7a',props:[{"addr": "3538 South Cupertino Drive, Gilbert, AZ 85297", "rent": true, "maint": true}]},
+  {id:156,name:'Rima Akras',initials:'RA',email:'rimaakras29@gmail.com',phone:'(425) 213-4335',color:'#c8a96e',props:[{"addr": "9471 West Troy Drive, Arizona City, AZ 85123", "rent": true, "maint": true}]},
+  {id:157,name:'Roberto Lozada',initials:'RL',email:'robertolozada015@gmail.com',phone:'(480) 430-6802',color:'#22d4c8',props:[{"addr": "15410 North 60th Avenue, Glendale, AZ 85306", "rent": true, "maint": true}]},
+  {id:158,name:'Rocio Alvarez',initials:'RA',email:'rocio.alvarez.cruz@gmail.com',phone:'(480) 274-0225',color:'#ff9f43',props:[{"addr": "23979 West Verlea Drive, Buckeye, AZ 85326", "rent": true, "maint": true}]},
+  {id:159,name:'Rohit Prasad and Samrudhi Patil',initials:'RP',email:'rohit.prasad15@gmail.com',phone:'(650) 537-9542',color:'#a29bfe',props:[{"addr": "9923 East Tillman Avenue, Mesa, AZ 85212", "rent": true, "maint": true}, {"addr": "12546 West Calle De Baca, Peoria, AZ 85383", "rent": true, "maint": true}, {"addr": "12556 West Calle De Baca, Peoria, AZ 85383", "rent": true, "maint": true}, {"addr": "2212 East Kelly Drive, Gilbert, AZ 85298", "rent": true, "maint": true}]},
+  {id:160,name:'Rudra Biswal and Sweety Sharma',initials:'RS',email:'rudra.p.biswal@gmail.com',phone:'(781) 952-9309',color:'#fd79a8',props:[{"addr": "10059 East Texas Avenue, Mesa, AZ 85212", "rent": true, "maint": true}]},
+  {id:161,name:'Ryan Fowler',initials:'RF',email:'fowlry88@gmail.com',phone:'(509) 834-5025',color:'#5b8fff',props:[{"addr": "22227 South 214th Street, Queen Creek, AZ 85142", "rent": true, "maint": true}]},
+  {id:162,name:'Ryan Stenmoen',initials:'RS',email:'r.stenmoen@gmail.com',phone:'(480) 246-1358',color:'#2dce89',props:[{"addr": "2992 North Miller Road, Unit 215B, Scottsdale, AZ 85251", "rent": true, "maint": true}, {"addr": "315 West Marconi Avenue, Phoenix, AZ 85023", "rent": true, "maint": true}]},
+  {id:163,name:'SAI A R SANKURUBHUKTHA JEEVITHA KAMATHAM',initials:'SK',email:'saiajayrajesh@gmail.com',phone:'(405) 762-3049',color:'#ffbe3d',props:[{"addr": "9117 West Sells Drive, Phoenix, AZ 85037", "rent": true, "maint": true}]},
+  {id:164,name:'SANJEEV SINGH AHSA SHARMA',initials:'SS',email:'sanjeev.729@gmail.com',phone:'(801) 864-5380',color:'#c97aff',props:[{"addr": "14238 West Bronco Trail, Surprise, AZ 85387", "rent": true, "maint": true}, {"addr": "2751 East Mews Road, Gilbert, AZ 85298", "rent": true, "maint": true}]},
+  {id:165,name:'SARA SPIELBERGER',initials:'SS',email:'sara.mcroyal@gmail.com',phone:'(623) 262-0566',color:'#ff7a7a',props:[{"addr": "2150 East Bell Road, Unit 1039, Phoenix, AZ 85022", "rent": true, "maint": true}]},
+  {id:166,name:'SATHIS K MALUSAMY',initials:'SM',email:'msathis@outlook.com',phone:'(480) 522-6540',color:'#c8a96e',props:[{"addr": "3051 East Balsam Drive, Chandler, AZ 85286", "rent": true, "maint": true}]},
+  {id:167,name:'SHARA C HIGHT and DYLAN CHAMBERLAIN',initials:'SC',email:'chamberlaindylan@ymail.com',phone:'(832) 390-9785',color:'#22d4c8',props:[{"addr": "18266 North 39th Drive, Glendale, AZ 85308", "rent": true, "maint": true}]},
+  {id:168,name:'SHARATBABU NELLUTLA',initials:'SN',email:'pratiushaonline@gmail.com',phone:'(781) 835-0229',color:'#ff9f43',props:[{"addr": "231 East Azalea Dr, Chandler, AZ, Chandler, AZ 85286", "rent": true, "maint": true}, {"addr": "953 West Yellowstone Way, Chandler, AZ 85248", "rent": true, "maint": true}]},
+  {id:169,name:'SRINIVAS MUKUNDA and NAGANANDINI CHITTA',initials:'SC',email:'mukunda_ss@ymail.com',phone:'(239) 464-0643',color:'#a29bfe',props:[{"addr": "4085 South Quinn Avenue, Gilbert, AZ 85297", "rent": true, "maint": true}]},
+  {id:170,name:'SRINIVASAN SUNDARAM',initials:'SS',email:'vengu83@gmail.com',phone:'(480) 526-2316',color:'#fd79a8',props:[{"addr": "17147 North 9th Place, Phoenix, AZ 85022", "rent": true, "maint": true}]},
+  {id:171,name:'STEPHEN ROSS BRITTANY BRONSORD',initials:'SB',email:'bsdgpropertymanagement@gmail.com',phone:'(925) 285-3846',color:'#5b8fff',props:[{"addr": "1130 East Butler Drive, Unit B5, Phoenix, AZ 85020", "rent": true, "maint": true}]},
+  {id:172,name:'SUBBA R & LAKSHMI K KOSURU',initials:'SK',email:'subbark@gmail.com',phone:'(480) 398-6069',color:'#2dce89',props:[{"addr": "10559 East Morning Star Drive, Scottsdale, AZ 85255", "rent": true, "maint": true}]},
+  {id:173,name:'Sameer Gupta',initials:'SG',email:'guptasameer1984@gmail.com',phone:'602-653-4698',color:'#ffbe3d',props:[{"addr": "2349 West Gloria Lane, Phoenix, AZ 85085", "rent": true, "maint": true}]},
+  {id:174,name:'Sathishkumar Ragupathy',initials:'SR',email:'vidhyavishu91@gmail.com',phone:'(408) 643-2553',color:'#c97aff',props:[{"addr": "11443 West Saint John Road, Surprise, AZ 85378", "rent": true, "maint": true}]},
+  {id:175,name:'Satish Namburi and Naga Akey',initials:'SA',email:'satish.nambur@gmail.com',phone:'(317) 640-0146',color:'#ff7a7a',props:[{"addr": "18777 North 43rd Avenue, Unit 3, Glendale, AZ 85308", "rent": true, "maint": true}]},
+  {id:176,name:'Saurabh Nayar',initials:'SN',email:'nayar.saurabh@gmail.com',phone:'(425) 638-9327',color:'#c8a96e',props:[{"addr": "5431 West Fetlock Trail, Phoenix, AZ 85083", "rent": true, "maint": true}]},
+  {id:177,name:'Savannah Faruzzi and Elizabeth Brugioni',initials:'SB',email:'lizfaruzzi@gmail.com',phone:'(630) 688-8688',color:'#22d4c8',props:[{"addr": "1934 East Secretariat Drive, Tempe, AZ 85284", "rent": true, "maint": true}]},
+  {id:178,name:'Scott Wolfe',initials:'SW',email:'srwolfe1962@msn.com',phone:'(602) 793-8065',color:'#ff9f43',props:[{"addr": "2646 East 1st Street, Mesa, AZ 85213", "rent": true, "maint": true}]},
+  {id:179,name:'Serafin and Fabiola Diaz',initials:'SD',email:'serafin_diaz@outlook.com',phone:'(818) 439-1431',color:'#a29bfe',props:[{"addr": "286 West Palomino Drive, Unit 56, Chandler, AZ 85225", "rent": true, "maint": true}]},
+  {id:180,name:'Shamanth Vijaya Kumar',initials:'SK',email:'shamanthvijay@gmail.com',phone:'(602) 900-6105',color:'#fd79a8',props:[{"addr": "4077 South Sabrina Drive, Unit 56, Chandler, AZ 85248", "rent": true, "maint": true}]},
+  {id:181,name:'Shivani Wilcox',initials:'SW',email:'jakeandshivani@gmail.com',phone:'(847) 346-6161',color:'#5b8fff',props:[{"addr": "22532 East Camina Plata, Queen Creek, AZ 85142", "rent": true, "maint": true}]},
+  {id:182,name:'Shravan Kumar Nellutla',initials:'SN',email:'shravantalk@gmail.com',phone:'(480) 234-5957',color:'#2dce89',props:[{"addr": "217 East Raleigh Drive, Chandler, AZ 85286", "rent": true, "maint": true}, {"addr": "651 West Derringer Way, Chandler, AZ 85225", "rent": true, "maint": true}, {"addr": "931 West Yellowstone Way, Chandler, AZ 85248", "rent": true, "maint": true}]},
+  {id:183,name:'Sierra Crosby',initials:'SC',email:'scrosby1@live.com',phone:'(602) 425-0421',color:'#ffbe3d',props:[{"addr": "1716 West Cortez Street, Unit 239, Phoenix, AZ 85029", "rent": true, "maint": true}]},
+  {id:184,name:'Siyao Li',initials:'SL',email:'sonia_lee929@me.com',phone:'(480) 277-4184',color:'#c97aff',props:[{"addr": "1118 East Park Avenue, Chandler, AZ 85225", "rent": true, "maint": true}]},
+  {id:185,name:'Skyler Rodolph',initials:'SR',email:'srodolph@gmail.com',phone:'(503) 505-0660',color:'#ff7a7a',props:[{"addr": "1501 East Commerce Avenue, Gilbert, AZ 85234", "rent": true, "maint": true}]},
+  {id:186,name:'Smart Investment LLC',initials:'SL',email:'fuad10111@yahoo.com',phone:'(623) 308-0805',color:'#c8a96e',props:[{"addr": "19302 North 73rd Lane, Glendale, AZ 85308", "rent": true, "maint": true}, {"addr": "2454 East Longhorn Place, Chandler, AZ 85286", "rent": true, "maint": true}]},
+  {id:187,name:'Sri Sai Datta Kiran Sistla',initials:'SS',email:'saidatta.sistla@gmail.com',phone:'(817) 307-0183',color:'#22d4c8',props:[{"addr": "89 West Patrick Street, Gilbert, AZ 85233", "rent": true, "maint": true}]},
+  {id:188,name:'Srinivas and Uma Challaram',initials:'SC',email:'challaram@gmail.com',phone:'(732) 853-2451',color:'#ff9f43',props:[{"addr": "7966 West Medlock Drive, Glendale, AZ 85303", "rent": true, "maint": true}]},
+  {id:189,name:'Srivasthava Dacharju',initials:'SD',email:'vasu.srivasthav@gmail.com',phone:'(480) 330-6271',color:'#a29bfe',props:[{"addr": "4129 East Appaloosa Road, Gilbert, AZ 85296", "rent": true, "maint": true}]},
+  {id:190,name:'Stephanie Hester',initials:'SH',email:'mzstephaniejane@gmail.com',phone:'(602) 752-7795',color:'#fd79a8',props:[{"addr": "5814 West Wood Street, Phoenix, AZ 85043", "rent": true, "maint": true}]},
+  {id:191,name:'Steven Phelps',initials:'SP',email:'steven.phelps89@yahoo.com',phone:'(480) 363-0334',color:'#5b8fff',props:[{"addr": "1445 South Park Grove Circle, Gilbert, AZ 85296", "rent": true, "maint": true}]},
+  {id:192,name:'Sundeep Vanga',initials:'SV',email:'sundeep.vanga@gmail.com',phone:'(612) 208-5180',color:'#2dce89',props:[{"addr": "8589 North 168th Drive, Waddell, AZ 85355", "rent": true, "maint": true}]},
+  {id:193,name:'Thakur Family Trust',initials:'TT',email:'anand.shandilya@gmail.com',phone:'(614) 602-7519',color:'#ffbe3d',props:[{"addr": "2620 West Rabjohn Road, Phoenix, AZ 85085", "rent": true, "maint": true}]},
+  {id:194,name:'Thanhdu and Desiree Nguyen',initials:'TN',email:'dizzyd2780@gmail.com',phone:'(720) 256-7679',color:'#c97aff',props:[{"addr": "850 South River Drive, Unit 2076, Tempe, AZ 85281", "rent": true, "maint": true}]},
+  {id:195,name:'The Manikandan Kalaivani Family Trust dated May 11, 2021',initials:'T2',email:'kalaits.bala@gmail.com',phone:'(650) 660-3672',color:'#ff7a7a',props:[{"addr": "14349 West Smoketree Drive, Surprise, AZ 85387", "rent": true, "maint": true}, {"addr": "12440 West Calle De Baca, Peoria, AZ 85383", "rent": true, "maint": true}, {"addr": "16058 West Gray Fox Trail, Surprise, AZ 85387", "rent": true, "maint": true}]},
+  {id:196,name:'Thelma Whaling',initials:'TW',email:'thelmawhaling@yahoo.com',phone:'(818) 442-8859',color:'#c8a96e',props:[{"addr": "1543 South Longspur Lane, Gilbert, AZ 85295", "rent": true, "maint": true}]},
+  {id:197,name:'Thomas Pendell',initials:'TP',email:'tompendell1@gmail.com',phone:'(480) 250-4930',color:'#22d4c8',props:[{"addr": "8055 East Thomas Road, Unit B304, Scottsdale, AZ 85251", "rent": true, "maint": true}]},
+  {id:198,name:'Tina Vu',initials:'TV',email:'tina.v0223@gmail.com',phone:'(602) 703-6982',color:'#ff9f43',props:[{"addr": "6546 West Latona Road, Phoenix, AZ 85339", "rent": true, "maint": true}]},
+  {id:199,name:'Ting Kirby',initials:'TK',email:'ttkirby@msn.com',phone:'(419) 819-9239',color:'#a29bfe',props:[{"addr": "4031 East Sidewinder Court, Gilbert, AZ 85297", "rent": true, "maint": true}]},
+  {id:200,name:'Tony WeiZhao Yu',initials:'TY',email:'tyu12689@gmail.com',phone:'(480) 455-8726',color:'#fd79a8',props:[{"addr": "656 West Nopal Avenue, Mesa, AZ 85210", "rent": true, "maint": true}]},
+  {id:201,name:'True North Homes LLC',initials:'TL',email:'mail@kristielane.com',phone:'(602) 292-9004',color:'#5b8fff',props:[{"addr": "9459 North 64th Drive, Glendale, AZ 85302", "rent": true, "maint": true}]},
+  {id:202,name:'Uduak Ukpong',initials:'UU',email:'uduak.ukpong@gmail.com',phone:'(602) 550-7757',color:'#2dce89',props:[{"addr": "15447 West Poinsettia Drive, Surprise, AZ 85379", "rent": true, "maint": true}]},
+  {id:203,name:'VEERAREEDY & VIJYALAKSMI BAPATHU',initials:'VB',email:'veerareddy2020@gmail.com',phone:'(602) 880-8156',color:'#ffbe3d',props:[{"addr": "2140 West Kathleen Road, Phoenix, AZ 85023", "rent": true, "maint": true}]},
+  {id:204,name:'VICTOR VARGAS',initials:'VV',email:'vhvargas83@hotmail.com',phone:'(626) 923-8630',color:'#c97aff',props:[{"addr": "14515 South Vera Cruz Road, Arizona City, AZ 85123", "rent": true, "maint": true}]},
+  {id:205,name:'Venkata Sumanth Krishna Nori',initials:'VN',email:'sumanth547@gmail.com',phone:'(480) 295-2495',color:'#ff7a7a',props:[{"addr": "858 East Knightsbridge Way, Gilbert, AZ 85297", "rent": true, "maint": true}]},
+  {id:206,name:'Vidyasagar Guduru',initials:'VG',email:'vidyasagar.guduru@gmail.com',phone:'(480) 252-1895',color:'#c8a96e',props:[{"addr": "39810 North River Bend Road, Anthem, AZ 85086", "rent": true, "maint": true}]},
+  {id:207,name:'Vinay Jain',initials:'VJ',email:'vinayjain@gmail.com',phone:'(480) 399-3660',color:'#22d4c8',props:[{"addr": "229 West Sandra Terrace, Phoenix, AZ 85023", "rent": true, "maint": true}]},
+  {id:208,name:'Vincent Nguyen',initials:'VN',email:'vunguyen081289@gmail.com',phone:'(480) 669-0652',color:'#ff9f43',props:[{"addr": "562 North Kingston Street, Gilbert, AZ 85233", "rent": true, "maint": true}]},
+  {id:209,name:'William Nieman',initials:'WN',email:'wriker4@gmail.com',phone:'(253) 318-3076',color:'#a29bfe',props:[{"addr": "4919 North Granite Reef Road, Scottsdale, AZ 85251", "rent": true, "maint": true}]},
+  {id:210,name:'Xuebin Li',initials:'XL',email:'xuebin.lee@gmail.com',phone:'(408) 368-5541',color:'#fd79a8',props:[{"addr": "201 West Cardinal Way, Chandler, AZ 85286", "rent": true, "maint": true}]},
+  {id:211,name:'YAONING WU',initials:'YW',email:'bertramwyn@hotmail.com',phone:'(812) 241-0992',color:'#5b8fff',props:[{"addr": "1122 East Nolan Place, Chandler, AZ 85249", "rent": true, "maint": true}]},
+  {id:212,name:'YVETTE & ERIC GRIJALVA',initials:'YG',email:'3ricgee101@gmail.com',phone:'(602) 544-9626',color:'#2dce89',props:[{"addr": "14590 West Windsor Avenue, Goodyear, AZ 85395", "rent": true, "maint": true}]},
+  {id:213,name:'Ying-Shan Hsu',initials:'YH',email:'ishanihsu@gmail.com',phone:'(408) 507-4589',color:'#ffbe3d',props:[{"addr": "901 South Smith Road, Unit 1016, Tempe, AZ 85281", "rent": true, "maint": true}]},
+  {id:214,name:'Yordnos Teffera',initials:'YT',email:'dolly7p@gmail.com',phone:'(571) 239-5267',color:'#c97aff',props:[{"addr": "4202 North 21st Street, Unit 11, Phoenix, AZ 85016", "rent": true, "maint": true}]},
+  {id:215,name:'Yoshi Konishima',initials:'YK',email:'tsuyoshi.kaneshima@gmail.com',phone:'(510) 821-2490',color:'#ff7a7a',props:[{"addr": "1938 South Sandstone Street, Gilbert, AZ 85295", "rent": true, "maint": true}]},
+  {id:216,name:'ZHEHAO WANG',initials:'ZW',email:'shaunwang86@gmail.com',phone:'(541) 490-0753',color:'#c8a96e',props:[{"addr": "1919 West Highland Street, Chandler, AZ 85224", "rent": true, "maint": true}]},
+  {id:217,name:'ron belczyk',initials:'RB',email:'rab4711@gmail.com',phone:'(949) 637-8150',color:'#22d4c8',props:[{"addr": "37852 North Sandy Drive, San Tan Valley, AZ 85140", "rent": true, "maint": true}]}
+];
+
+const S={selected:null,checked:{},audited:new Set(),sent:[]};
+
+function propStatus(p){const n=(!p.rent?1:0)+(!p.maint?1:0);return n===0?'ok':n===1?'warn':'danger';}
+function ownerStatus(o){if(!S.audited.has(o.id))return'pending';const s=o.props.map(propStatus);if(s.every(x=>x==='ok'))return'ok';if(s.some(x=>x==='danger'))return'danger';return'warn';}
+function badgeHtml(s){const m={ok:'badge-ok',warn:'badge-warn',danger:'badge-danger',pending:'badge-pending',sent:'badge-sent'};const l={ok:'No issues',warn:'1 issue',danger:'Issues',pending:'Pending',sent:'Sent'};return'<span class="badge '+m[s]+'">'+l[s]+'</span>';}
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2800);}
+function issueList(o){const lines=[];o.props.forEach(p=>{if(!p.rent)lines.push('• '+p.addr+': rent delinquency');if(!p.maint)lines.push('• '+p.addr+': open maintenance request');});return lines;}
+
+function updateStats(){
+  const totalIssues=OWNERS.reduce((n,o)=>n+o.props.reduce((a,p)=>a+(!p.rent?1:0)+(!p.maint?1:0),0),0);
+  document.getElementById('ov-owners').textContent=OWNERS.length;
+  document.getElementById('ov-props').textContent=OWNERS.reduce((n,o)=>n+o.props.length,0);
+  document.getElementById('ov-issues').textContent=totalIssues;
+  document.getElementById('ov-sent').textContent=S.sent.length;
+  document.getElementById('nav-pending-count').textContent=OWNERS.length-S.audited.size;
+  document.getElementById('nav-sent-count').textContent=S.sent.length;
+  const pct=Math.round((S.audited.size/OWNERS.length)*100);
+  document.getElementById('prog-bar').style.width=pct+'%';
+  document.getElementById('audit-progress-label').textContent=S.audited.size+' / '+OWNERS.length+' audited';
+}
+
+function renderOverview(){
+  const g=document.getElementById('overview-grid');
+  g.innerHTML=OWNERS.map(o=>{
+    const st=ownerStatus(o);
+    const chips=o.props.map(p=>'<span class="prop-chip '+((!p.rent||!p.maint)?'issue':'')+'">'+p.addr.split(',')[0]+'</span>').join('');
+    return'<div class="owner-card" onclick="goAudit('+o.id+')">'+
+      '<div class="owner-card-head"><div class="o-avatar" style="width:34px;height:34px;background:'+o.color+'22;color:'+o.color+';box-shadow:0 0 14px '+o.color+'33;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">'+o.initials+'</div>'+
+      '<div><div class="owner-card-name">'+o.name+'</div><div class="owner-card-email">'+o.email+'</div></div></div>'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'+badgeHtml(st)+'<span style="font-size:10px;color:var(--text3);">'+o.props.length+' propert'+(o.props.length>1?'ies':'y')+'</span></div>'+
+      '<div class="prop-chips">'+chips+'</div></div>';
+  }).join('');
+  requestAnimationFrame(attachCardTilt);
+}
+function goAudit(id){showView('audit');selectOwner(id);}
+
+function renderOwnerList(){
+  const el=document.getElementById('audit-owner-list');
+  el.innerHTML=OWNERS.map(o=>{
+    const st=ownerStatus(o);
+    const sel=S.selected?.id===o.id?' selected':'';
+    const sentMark=S.sent.find(s=>s.ownerId===o.id)?' <span class="badge badge-sent" style="font-size:9px;">Sent</span>':'';
+    return'<div class="owner-row'+sel+'" onclick="selectOwner('+o.id+')">'+
+      '<div class="o-avatar" style="background:'+o.color+'22;color:'+o.color+';box-shadow:0 0 10px '+o.color+'33;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">'+o.initials+'</div>'+
+      '<div style="flex:1;min-width:0;"><div class="owner-name">'+o.name+sentMark+'</div><div class="owner-meta">'+o.props.length+' props</div></div>'+
+      badgeHtml(st)+'</div>';
+  }).join('');
+}
+
+function selectOwner(id){S.selected=OWNERS.find(o=>o.id===id);renderOwnerList();renderPropTable();renderComposer();updateStats();}
+
+function renderPropTable(){
+  const o=S.selected;if(!o)return;
+  document.getElementById('detail-owner-name').textContent=o.name;
+  document.getElementById('detail-owner-email').textContent=o.email||'No email on file';
+  const ch=S.checked[o.id]||new Set();
+  const allDone=o.props.every(p=>propStatus(p)==='ok'||ch.has(p.id));
+  document.getElementById('detail-actions').innerHTML=
+    '<button class="btn btn-outline btn-sm" onclick="checkAllNoIssue('+o.id+')">Auto-check clean</button>'+
+    '<button class="btn btn-primary btn-sm" onclick="markAudited('+o.id+')"'+(allDone?'':' disabled')+'>Mark audited</button>';
+  const rows=o.props.map(p=>{
+    const s=propStatus(p);const done=s==='ok'||ch.has(p.id);
+    const issues=[];if(!p.rent)issues.push('<span style="color:var(--red);">Rent delinquent</span>');if(!p.maint)issues.push('<span style="color:var(--amber);">Open maintenance</span>');
+    return'<tr><td><div class="check-circle '+(done?'done':'')+'" onclick="toggleProp('+o.id+',''+p.id+'')">'+(done?'<svg fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div></td>'+
+      '<td style="font-weight:600;">'+p.addr+'</td>'+
+      '<td>'+(issues.length?issues.join(', '):'<span style="color:var(--green);">Clear</span>')+'</td>'+
+      '<td>'+badgeHtml(s)+'</td></tr>';
+  }).join('');
+  document.getElementById('prop-body').innerHTML='<table class="prop-table"><thead><tr><th style="width:40px;"></th><th>Property</th><th>Issues</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+function toggleProp(ownerId,propId){if(!S.checked[ownerId])S.checked[ownerId]=new Set();const s=S.checked[ownerId];s.has(propId)?s.delete(propId):s.add(propId);renderPropTable();}
+function checkAllNoIssue(ownerId){const o=OWNERS.find(x=>x.id===ownerId);if(!S.checked[ownerId])S.checked[ownerId]=new Set();o.props.filter(p=>propStatus(p)==='ok').forEach(p=>S.checked[ownerId].add(p.id));renderPropTable();toast('Clean properties checked off');}
+function markAudited(id){S.audited.add(id);renderOwnerList();updateStats();toast(S.selected.name+' marked as audited');document.getElementById('email-compose-panel').style.display='block';renderComposer();const next=OWNERS.find(o=>!S.audited.has(o.id));if(!next)toast('All owners audited!');}
+
+function renderComposer(){
+  const o=S.selected;if(!o)return;
+  const issues=issueList(o);const hasIssues=issues.length>0;
+  const alreadySent=S.sent.find(s=>s.ownerId===o.id);
+  document.getElementById('compose-status').textContent=alreadySent?'Sent':'Draft';
+  document.getElementById('compose-status').className='badge '+(alreadySent?'badge-sent':'badge-pending');
+  const subject='Portfolio follow-up — '+o.name;
+  const body=hasIssues?'Hi '+o.name.split(' ')[0]+',\n\nI wanted to follow up on a few open items from your recent portfolio review:\n\n'+issues.join('\n')+'\n\nPlease reach out at your earliest convenience so we can address these together.\n\nThank you,\nOn Q Property Management':'Hi '+o.name.split(' ')[0]+',\n\nJust a quick note following our portfolio review — everything looks great across your properties. No action is needed at this time.\n\nThank you for the continued partnership!\n\nBest,\nOn Q Property Management';
+  document.getElementById('email-compose-panel').style.display='block';
+  document.getElementById('composer-body').innerHTML=
+    '<div class="field"><div class="field-label">To</div><div class="field-val">'+o.name+' &lt;'+(o.email||'No email on file')+'&gt;</div></div>'+
+    '<div class="field"><div class="field-label">Subject</div><input type="text" id="email-subj" value="'+subject+'"/></div>'+
+    '<div class="field"><div class="field-label">Message</div><textarea id="email-body">'+body+'</textarea></div>'+
+    '<div class="composer-actions">'+
+      '<button class="tpl-picker-btn" onclick="openTplModal('+o.id+')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Use Template</button>'+
+      '<button class="btn btn-primary" onclick="sendEmail('+o.id+')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Send via Gmail</button>'+
+      '<button class="btn btn-outline" onclick="copyEmail()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copy</button>'+
+    '</div>';
+}
+
+function sendEmail(ownerId){
+  const subj=document.getElementById('email-subj')?.value||'';
+  const body=document.getElementById('email-body')?.value||'';
+  const o=OWNERS.find(x=>x.id===ownerId);
+  if(!S.sent.find(s=>s.ownerId===ownerId))S.sent.push({ownerId,name:o.name,email:o.email,subject:subj,body,time:new Date().toLocaleTimeString()});
+  updateStats();renderOwnerList();renderEmailLog();
+  document.getElementById('compose-status').textContent='Sent';
+  document.getElementById('compose-status').className='badge badge-sent';
+  toast('Email sent to '+o.email+' via Gmail ✓');
+}
+function copyEmail(){const body=document.getElementById('email-body')?.value||'';navigator.clipboard?.writeText(body).then(()=>toast('Copied to clipboard'));}
+
+function renderEmailLog(){
+  const el=document.getElementById('email-log-body');
+  if(!S.sent.length){el.innerHTML='<div class="empty"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>No emails sent yet</div>';return;}
+  el.innerHTML=S.sent.map(s=>{
+    const o=OWNERS.find(x=>x.id===s.ownerId);
+    return'<div class="email-log-row"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'+
+      '<div style="width:32px;height:32px;background:'+o.color+'22;color:'+o.color+';font-size:11px;font-weight:700;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:50%;box-shadow:0 0 10px '+o.color+'33;">'+o.initials+'</div>'+
+      '<div style="flex:1;"><div style="font-size:13px;font-weight:600;">'+s.name+'</div><div style="font-size:11px;color:var(--text3);">'+s.email+' · '+s.time+'</div></div>'+
+      '<span class="badge badge-sent">Sent</span></div>'+
+      '<div style="font-size:12px;color:var(--text2);font-weight:600;margin-bottom:4px;">'+s.subject+'</div>'+
+      '<div class="email-body-preview">'+s.body+'</div></div>';
+  }).join('');
+}
+
+// ── TEMPLATES ──
+const DEFAULT_TEMPLATES=[
+  {id:'t1',name:'All Clear',desc:'No issues found',body:'Hi [Owner Name],\n\nI completed the portfolio review for your properties and everything looks great — rent is current and there are no open maintenance items.\n\nWe truly appreciate your continued partnership with On Q Property Management.\n\nBest regards,\nOn Q Property Management'},
+  {id:'t2',name:'Rent Delinquency',desc:'Rent past due follow-up',body:'Hi [Owner Name],\n\nI am following up on your recent portfolio review. Our records show that rent is currently past due on one or more of your properties.\n\n[PASTE PROPERTY DETAILS HERE]\n\nPlease reach out so we can work together to resolve this promptly.\n\nBest regards,\nOn Q Property Management'},
+  {id:'t3',name:'Maintenance Open',desc:'Open maintenance requests',body:'Hi [Owner Name],\n\nDuring our portfolio review, we identified open maintenance requests that require your attention or authorization.\n\n[PASTE MAINTENANCE DETAILS HERE]\n\nPlease let us know how you would like to proceed.\n\nBest regards,\nOn Q Property Management'},
+  {id:'t4',name:'Multiple Issues',desc:'Rent + maintenance issues',body:'Hi [Owner Name],\n\nFollowing our portfolio audit, we want to flag a few items that need attention:\n\nRent Status:\n[PASTE RENT DETAILS HERE]\n\nMaintenance:\n[PASTE MAINTENANCE DETAILS HERE]\n\nPlease reach out at your earliest convenience.\n\nBest regards,\nOn Q Property Management'},
+];
+let TEMPLATES=JSON.parse(localStorage.getItem('onq_templates')||'null')||JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));
+let editingTplId=null;
+function saveTemplatesToStorage(){try{localStorage.setItem('onq_templates',JSON.stringify(TEMPLATES));}catch(e){}}
+function openTplModal(applyToOwnerId){window._tplApplyTarget=applyToOwnerId||null;renderTplList();document.getElementById('tpl-modal').classList.add('open');if(TEMPLATES.length>0)selectTpl(TEMPLATES[0].id);}
+function closeTplModal(){document.getElementById('tpl-modal').classList.remove('open');window._tplApplyTarget=null;}
+function renderTplList(){const el=document.getElementById('tpl-list');el.innerHTML=TEMPLATES.map(t=>'<div class="tpl-item'+(editingTplId===t.id?' active':'')+'" onclick="selectTpl(''+t.id+'')"><div class="tpl-item-name">'+escHtml(t.name)+'</div><div class="tpl-item-desc">'+escHtml(t.desc)+'</div></div>').join('')||'<div style="padding:1rem;font-size:12px;color:var(--text3);">No templates yet.</div>';}
+function selectTpl(id){
+  editingTplId=id;const t=TEMPLATES.find(x=>x.id===id);if(!t)return;renderTplList();
+  const applyBtn=window._tplApplyTarget?'<button class="btn btn-gold btn-sm" onclick="applyTemplate(''+id+'')" style="margin-right:auto;">Apply to email</button>':'';
+  document.getElementById('tpl-editor').innerHTML=
+    '<div><div class="tpl-field-label">Template name</div><input class="tpl-name-input" id="tpl-name-inp" type="text" value="'+escHtml(t.name)+'"/></div>'+
+    '<div><div class="tpl-field-label">Description</div><input class="tpl-name-input" id="tpl-desc-inp" type="text" value="'+escHtml(t.desc)+'"/></div>'+
+    '<div><div class="tpl-field-label">Email body</div><textarea class="tpl-textarea" id="tpl-body-inp" style="min-height:260px;">'+escHtml(t.body)+'</textarea></div>'+
+    '<div class="tpl-hint">💡 Use <strong>[Owner Name]</strong> as a placeholder — it will be auto-replaced when applied.</div>'+
+    '<div style="display:flex;gap:8px;">'+applyBtn+'</div>';
+  document.getElementById('tpl-modal-foot').style.display='flex';
+}
+function newTemplate(){const id='t'+Date.now();TEMPLATES.push({id,name:'New Template',desc:'Click to edit',body:''});saveTemplatesToStorage();renderTplList();selectTpl(id);}
+function saveTemplate(){if(!editingTplId)return;const t=TEMPLATES.find(x=>x.id===editingTplId);if(!t)return;t.name=document.getElementById('tpl-name-inp')?.value||t.name;t.desc=document.getElementById('tpl-desc-inp')?.value||t.desc;t.body=document.getElementById('tpl-body-inp')?.value||t.body;saveTemplatesToStorage();renderTplList();toast('Template saved: '+t.name);}
+function deleteTemplate(){if(!editingTplId)return;if(!confirm('Delete this template?'))return;TEMPLATES=TEMPLATES.filter(x=>x.id!==editingTplId);editingTplId=null;saveTemplatesToStorage();renderTplList();document.getElementById('tpl-editor').innerHTML='<div style="text-align:center;color:var(--text3);padding:2rem;font-size:13px;">Select a template or create a new one.</div>';document.getElementById('tpl-modal-foot').style.display='none';toast('Template deleted');}
+function applyTemplate(tplId){const t=TEMPLATES.find(x=>x.id===tplId);const ownerId=window._tplApplyTarget;if(!t||!ownerId)return;const o=OWNERS.find(x=>x.id===ownerId);const firstName=o?o.name.split(' ')[0]:'[Owner Name]';const body=t.body.replace(/\[Owner Name\]/g,firstName);closeTplModal();const ta=document.getElementById('email-body');if(ta){ta.value=body;toast('Template applied: '+t.name);};}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+document.getElementById('tpl-modal').addEventListener('click',function(e){if(e.target===this)closeTplModal();});
+
+// ── LATE RENT ──
+const EV_STAGES=[{id:1,label:'Notice Sent',cls:'ev-stage-1'},{id:2,label:'30-Day',cls:'ev-stage-2'},{id:3,label:'Filing Filed',cls:'ev-stage-3'},{id:4,label:'Court Date',cls:'ev-stage-4'},{id:5,label:'Resolved',cls:'ev-stage-5'}];
+let EVICTIONS=JSON.parse(localStorage.getItem('onq_evictions')||'null')||[];
+function saveEvictions(){try{localStorage.setItem('onq_evictions',JSON.stringify(EVICTIONS));}catch(e){}}
+function evStageObj(id){return EV_STAGES.find(s=>s.id===id)||EV_STAGES[0];}
+function renderEvStats(){
+  const active=EVICTIONS.filter(e=>!e.resolved);
+  const totalOwed=active.reduce((s,e)=>s+e.amtOwed,0);
+  const avgDays=active.length?Math.round(active.reduce((s,e)=>s+e.daysLate,0)/active.length):0;
+  const resolved=EVICTIONS.filter(e=>e.resolved).length;
+  const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  el('ev-stat-active',active.length);el('ev-stat-owed','$'+totalOwed.toLocaleString());el('ev-stat-days',avgDays);el('ev-stat-resolved',resolved);
+  const b=document.getElementById('nav-laterent-count');if(b)b.textContent=active.length;
+}
+function renderEvTable(){
+  const tbody=document.getElementById('ev-tbody');if(!tbody)return;
+  if(!EVICTIONS.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text3);">No late rent cases yet.</td></tr>';renderEvStats();return;}
+  tbody.innerHTML=EVICTIONS.map(ev=>{
+    const st=evStageObj(ev.stage);
+    const dangerRow=ev.stage>=3&&!ev.resolved?' class="ev-row-danger"':'';
+    const timeline=EV_STAGES.map((s,i)=>{const isDone=ev.stage>s.id;const isActive=ev.stage===s.id;const cls=isDone?'done':isActive?'active':'';const lineCls=isDone&&i<EV_STAGES.length-1?'done':'';return(i>0?'<div class="ev-tl-line '+lineCls+'"></div>':'')+'<div class="ev-tl-step '+cls+'" title="'+s.label+'" onclick="advanceStage(''+ev.id+'','+s.id+')"><div class="ev-tl-dot"></div></div>';}).join('');
+    return'<tr'+dangerRow+'><td><div style="font-weight:600;font-size:13px;">'+ev.tenant+'</div><div style="font-size:11px;color:var(--text3);">'+ev.property+'</div><div style="display:flex;align-items:center;margin-top:6px;">'+timeline+'</div></td>'+
+      '<td style="font-size:12px;color:var(--text2);">'+ev.owner+'</td>'+
+      '<td><span style="font-size:14px;font-weight:700;color:var(--amber);">$'+ev.amtOwed.toLocaleString()+'</span></td>'+
+      '<td><span style="font-size:13px;font-weight:700;color:'+(ev.daysLate>=60?'var(--red)':ev.daysLate>=30?'var(--amber)':'var(--text)')+';">'+ev.daysLate+' days</span></td>'+
+      '<td><span class="ev-stage '+st.cls+'">'+st.label+'</span>'+(ev.resolved?'<span class="badge badge-ok" style="margin-left:4px;">Resolved</span>':'')+'</td>'+
+      '<td style="font-size:11px;color:var(--text3);max-width:160px;">'+ev.lastAction+'</td>'+
+      '<td style="text-align:right;"><div style="display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap;">'+
+        (!ev.resolved?'<button class="ev-action-btn" onclick="advanceEviction(''+ev.id+'')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>Advance</button>':'')+
+        '<button class="ev-action-btn" onclick="editEviction(''+ev.id+'')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'+
+        (!ev.resolved?'<button class="ev-action-btn" style="color:var(--green);" onclick="resolveEviction(''+ev.id+'')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>':'')+
+        '<button class="ev-action-btn" style="color:var(--red);" onclick="deleteEviction(''+ev.id+'')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>'+
+      '</div></td></tr>';
+  }).join('');
+  renderEvStats();
+}
+function advanceStage(id,stageId){const ev=EVICTIONS.find(e=>e.id===id);if(!ev||ev.resolved)return;ev.stage=stageId;saveEvictions();renderEvTable();toast('Stage updated');}
+function advanceEviction(id){const ev=EVICTIONS.find(e=>e.id===id);if(!ev||ev.resolved)return;if(ev.stage<5)ev.stage++;const stageNames=['','Notice Sent','30-Day Notice','Filing Filed','Court Date','Resolved'];ev.lastAction=stageNames[ev.stage]+' — '+new Date().toLocaleDateString();if(ev.stage===5)ev.resolved=true;saveEvictions();renderEvTable();toast('Case advanced to: '+evStageObj(ev.stage).label);}
+function resolveEviction(id){const ev=EVICTIONS.find(e=>e.id===id);if(!ev)return;ev.resolved=true;ev.stage=5;ev.lastAction='Resolved '+new Date().toLocaleDateString();saveEvictions();renderEvTable();toast('Case marked resolved');}
+function deleteEviction(id){if(!confirm('Delete this case?'))return;EVICTIONS=EVICTIONS.filter(e=>e.id!==id);saveEvictions();renderEvTable();toast('Case deleted');}
+let _editEvId=null;
+function openAddEviction(editId){_editEvId=editId||null;const ev=editId?EVICTIONS.find(e=>e.id===editId):null;document.getElementById('ev-modal-title').textContent=ev?'Edit Case':'New Late Rent Case';document.getElementById('ev-tenant').value=ev?ev.tenant:'';document.getElementById('ev-property').value=ev?ev.property:'';document.getElementById('ev-owner').value=ev?ev.owner:'';document.getElementById('ev-amt').value=ev?ev.amtOwed:'';document.getElementById('ev-days').value=ev?ev.daysLate:'';document.getElementById('ev-stage-sel').value=ev?ev.stage:1;document.getElementById('ev-last-action').value=ev?ev.lastAction:'';document.getElementById('ev-notes').value=ev?ev.notes:'';document.getElementById('ev-modal-backdrop').classList.add('open');}
+function editEviction(id){openAddEviction(id);}
+function closeEvModal(){document.getElementById('ev-modal-backdrop').classList.remove('open');}
+function saveEvCase(){
+  const tenant=document.getElementById('ev-tenant').value.trim();const property=document.getElementById('ev-property').value.trim();
+  if(!tenant||!property){toast('Tenant and property are required');return;}
+  const data={tenant,property,owner:document.getElementById('ev-owner').value.trim(),amtOwed:parseFloat(document.getElementById('ev-amt').value)||0,daysLate:parseInt(document.getElementById('ev-days').value)||0,stage:parseInt(document.getElementById('ev-stage-sel').value)||1,lastAction:document.getElementById('ev-last-action').value.trim(),notes:document.getElementById('ev-notes').value.trim(),resolved:false};
+  if(_editEvId){const ev=EVICTIONS.find(e=>e.id===_editEvId);Object.assign(ev,data);}else{EVICTIONS.push({id:'e'+Date.now(),...data});};
+  saveEvictions();renderEvTable();closeEvModal();toast(_editEvId?'Case updated':'New case added');
+}
+document.getElementById('ev-modal-backdrop').addEventListener('click',function(e){if(e.target===this)closeEvModal();});
+
+// ── EVICTIONS ──
+let EVICTIONS2=JSON.parse(localStorage.getItem('onq_evictions2')||'null')||[];
+function saveEvictions2(){try{localStorage.setItem('onq_evictions2',JSON.stringify(EVICTIONS2));}catch(e){}}
+const EV2_STATUS_CLS={'Filed':'badge-pending','Served':'badge-warn','Court Pending':'badge-warn','Judgment':'badge-danger','Won':'badge-ok','Settled':'badge-ok','Dismissed':'badge-pending'};
+function renderEv2Stats(){
+  const active=EVICTIONS2.filter(e=>!['Won','Settled','Dismissed'].includes(e.status));
+  const total=EVICTIONS2.reduce((s,e)=>s+e.amt,0);
+  const court=EVICTIONS2.filter(e=>e.status==='Court Pending').length;
+  const won=EVICTIONS2.filter(e=>['Won','Settled'].includes(e.status)).length;
+  const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  el('ev2-stat-active',active.length);el('ev2-stat-owed','$'+total.toLocaleString());el('ev2-stat-court',court);el('ev2-stat-won',won);
+  const b=document.getElementById('nav-eviction-count');if(b)b.textContent=active.length;
+}
+function renderEvTable2(){
+  const tbody=document.getElementById('ev2-tbody');if(!tbody)return;
+  if(!EVICTIONS2.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3);">No eviction cases yet.</td></tr>';renderEv2Stats();return;}
+  tbody.innerHTML=EVICTIONS2.map(ev=>{
+    const stCls=EV2_STATUS_CLS[ev.status]||'badge-pending';
+    const courtDisplay=ev.court?new Date(ev.court+'T12:00:00').toLocaleDateString():'<span style="color:var(--text3);">—</span>';
+    const filingDisplay=ev.filing?new Date(ev.filing+'T12:00:00').toLocaleDateString():'—';
+    const rowCls=(ev.status==='Court Pending'||ev.status==='Judgment')?' class="ev-row-danger"':'';
+    return'<tr'+rowCls+'><td><div style="font-weight:600;font-size:13px;">'+ev.tenant+'</div><div style="font-size:11px;color:var(--text3);">'+ev.property+'</div></td>'+
+      '<td style="font-size:12px;color:var(--text2);">'+ev.owner+'</td>'+
+      '<td><span style="font-size:14px;font-weight:700;color:var(--red);">$'+ev.amt.toLocaleString()+'</span></td>'+
+      '<td style="font-size:12px;">'+filingDisplay+'</td><td style="font-size:12px;font-weight:600;">'+courtDisplay+'</td>'+
+      '<td><span class="badge '+stCls+'">'+ev.status+'</span></td>'+
+      '<td style="font-size:11px;color:var(--text3);max-width:140px;">'+(ev.attorney?'<div style="font-weight:500;color:var(--text2);">'+ev.attorney+'</div>':'')+ev.notes+'</td>'+
+      '<td style="text-align:right;"><div style="display:flex;gap:5px;justify-content:flex-end;">'+
+        '<button class="ev-action-btn" onclick="editEv2(''+ev.id+'')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'+
+        '<button class="ev-action-btn" style="color:var(--red);" onclick="deleteEv2(''+ev.id+'')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>'+
+      '</div></td></tr>';
+  }).join('');
+  renderEv2Stats();
+}
+function deleteEv2(id){if(!confirm('Delete this case?'))return;EVICTIONS2=EVICTIONS2.filter(e=>e.id!==id);saveEvictions2();renderEvTable2();toast('Case deleted');}
+let _editEv2Id=null;
+function openAddEviction2(editId){_editEv2Id=editId||null;const ev=editId?EVICTIONS2.find(e=>e.id===editId):null;document.getElementById('ev2-modal-title').textContent=ev?'Edit Eviction Case':'New Eviction Case';document.getElementById('ev2-tenant').value=ev?ev.tenant:'';document.getElementById('ev2-property').value=ev?ev.property:'';document.getElementById('ev2-owner').value=ev?ev.owner:'';document.getElementById('ev2-amt').value=ev?ev.amt:'';document.getElementById('ev2-filing').value=ev?ev.filing:'';document.getElementById('ev2-court').value=ev?ev.court:'';document.getElementById('ev2-status').value=ev?ev.status:'Filed';document.getElementById('ev2-attorney').value=ev?ev.attorney:'';document.getElementById('ev2-notes').value=ev?ev.notes:'';document.getElementById('ev2-modal-backdrop').classList.add('open');}
+function editEv2(id){openAddEviction2(id);}
+function closeEv2Modal(){document.getElementById('ev2-modal-backdrop').classList.remove('open');}
+function saveEv2Case(){
+  const tenant=document.getElementById('ev2-tenant').value.trim();const property=document.getElementById('ev2-property').value.trim();
+  if(!tenant||!property){toast('Tenant and property are required');return;}
+  const data={tenant,property,owner:document.getElementById('ev2-owner').value.trim(),amt:parseFloat(document.getElementById('ev2-amt').value)||0,filing:document.getElementById('ev2-filing').value,court:document.getElementById('ev2-court').value,status:document.getElementById('ev2-status').value,attorney:document.getElementById('ev2-attorney').value.trim(),notes:document.getElementById('ev2-notes').value.trim()};
+  if(_editEv2Id){const ev=EVICTIONS2.find(e=>e.id===_editEv2Id);Object.assign(ev,data);}else{EVICTIONS2.push({id:'ev2-'+Date.now(),...data});};
+  saveEvictions2();renderEvTable2();closeEv2Modal();toast(_editEv2Id?'Case updated':'Eviction case added');
+}
+document.getElementById('ev2-modal-backdrop').addEventListener('click',function(e){if(e.target===this)closeEv2Modal();});
+
+// ── QUICK ADD ──
+function toggleQuickAdd(){const bar=document.getElementById('quick-add-bar');const isOpen=bar.style.display!=='none';bar.style.display=isOpen?'none':'block';if(!isOpen){document.getElementById('qa-date').value=new Date().toISOString().split('T')[0];document.getElementById('qa-tenant').focus();}}
+function quickAddEviction(){
+  const tenant=document.getElementById('qa-tenant').value.trim();const property=document.getElementById('qa-property').value.trim();const date=document.getElementById('qa-date').value;
+  if(!tenant){toast('Tenant name is required');return;}
+  EVICTIONS2.push({id:'ev2-'+Date.now(),tenant,property:property||'—',owner:'',amt:0,filing:new Date().toISOString().split('T')[0],court:date||'',status:'Filed',attorney:'',notes:'Added '+new Date().toLocaleDateString()});
+  saveEvictions2();renderEvTable2();
+  document.getElementById('qa-tenant').value='';document.getElementById('qa-property').value='';document.getElementById('qa-date').value='';
+  document.getElementById('quick-add-bar').style.display='none';
+  toast(tenant+' added to eviction list');
+}
+document.addEventListener('keydown',function(e){const bar=document.getElementById('quick-add-bar');if(e.key==='Enter'&&bar&&bar.style.display!=='none'){const active=document.activeElement;if(active&&(active.id==='qa-tenant'||active.id==='qa-property'||active.id==='qa-date'))quickAddEviction();}});
+
+// ── VIEWS ──
+const VIEWS={
+  overview:{title:'Portfolio Overview',sub:'All owners and properties at a glance'},
+  audit:{title:'Audit Portfolio',sub:'Review each owner systematically'},
+  email:{title:'Follow-up Emails',sub:'Track and manage sent follow-ups'},
+  laterent:{title:'Late Rent',sub:'Track delinquent rent cases progressing toward eviction'},
+  eviction:{title:'Eviction Cases',sub:'Legal filings, court dates, and outcomes'},
+};
+function showView(key){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.dock-btn').forEach(n=>n.classList.remove('active'));
+  document.getElementById('view-'+key).classList.add('active');
+  const dockEl=document.getElementById('dock-'+key);if(dockEl)dockEl.classList.add('active');
+  document.getElementById('page-title').textContent=VIEWS[key].title;
+  document.getElementById('page-sub').textContent=VIEWS[key].sub;
+  if(key==='email')renderEmailLog();
+  if(key==='laterent')renderEvTable();
+  if(key==='eviction')renderEvTable2();
+}
+function refreshData(){const icon=document.getElementById('sync-icon');if(icon)icon.style.animation='spin 0.8s linear infinite';setTimeout(()=>{if(icon)icon.style.animation='';},1600);toast('Salesforce sync — export a new report and upload to update');}
+
+// ── 3D TILT ──
+function attachCardTilt(){
+  document.querySelectorAll('.stat-card').forEach(card=>{
+    card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-0.5;const y=(e.clientY-r.top)/r.height-0.5;card.style.transform='translateY(-6px) perspective(600px) rotateX('+(-y*10)+'deg) rotateY('+(x*10)+'deg) scale(1.02)';});
+    card.addEventListener('mouseleave',()=>{card.style.transform='';});
+  });
+  document.querySelectorAll('.owner-card').forEach(card=>{
+    card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-0.5;const y=(e.clientY-r.top)/r.height-0.5;card.style.transform='translateY(-8px) perspective(500px) rotateX('+(-y*12)+'deg) rotateY('+(x*12)+'deg) scale(1.03)';card.style.boxShadow='0 28px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.12)';});
+    card.addEventListener('mouseleave',()=>{card.style.transform='';card.style.boxShadow='';});
+  });
+}
+
+// ── VERSION GUARD ──
+const DASHBOARD_VERSION='2026-06-20-v6';
+(function(){
+  const stored=localStorage.getItem('onq_dashboard_version');
+  if(stored!==DASHBOARD_VERSION){
+    const tpls=localStorage.getItem('onq_templates');
+    const ev=localStorage.getItem('onq_evictions');
+    const ev2=localStorage.getItem('onq_evictions2');
+    localStorage.clear();
+    if(tpls)localStorage.setItem('onq_templates',tpls);
+    if(ev)localStorage.setItem('onq_evictions',ev);
+    if(ev2)localStorage.setItem('onq_evictions2',ev2);
+    localStorage.setItem('onq_dashboard_version',DASHBOARD_VERSION);
+  }
+})();
+
+renderOverview();
+renderOwnerList();
+updateStats();
+attachCardTilt();
+</script>
+</body>
+</html>
